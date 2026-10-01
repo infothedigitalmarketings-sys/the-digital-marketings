@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Control Suite & Studio | The Digital Marketings</title>
+  <meta name="robots" content="noindex, nofollow">
+
+  <link rel="icon" type="image/png" href="assets/logo.png">
+  <link rel="shortcut icon" type="image/png" href="assets/logo.png">
+  <link rel="apple-touch-icon" href="assets/logo.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="admin.css">
+</head>
+<body>
+
+  <!-- Ambient Background Glows -->
+  <div class="admin-glow-orb admin-glow-orb-1" aria-hidden="true"></div>
+  <div class="admin-glow-orb admin-glow-orb-2" aria-hidden="true"></div>
+
+  <!-- Security PIN Lock Screen Overlay -->
+  <div class="lock-overlay" id="lockOverlay" aria-modal="true" role="dialog">
+    <div class="lock-card">
+      <div class="lock-icon-box">🔒</div>
+      <div class="brand-title" style="font-size: 1.3rem;">The Digital Marketings</div>
+      <p id="lockStatus" style="font-size: 0.85rem; color: var(--admin-text-muted);">Enter 4-digit security PIN (Default: 1234)</p>
+      
+      <div class="pin-dots-container">
+        <div class="pin-dot"></div>
+        <div class="pin-dot"></div>
+        <div class="pin-dot"></div>
+        <div class="pin-dot"></div>
+      </div>
+
+      <div class="keypad-grid">
+        <button type="button" class="keypad-btn" data-key="1">1</button>
+        <button type="button" class="keypad-btn" data-key="2">2</button>
+        <button type="button" class="keypad-btn" data-key="3">3</button>
+        <button type="button" class="keypad-btn" data-key="4">4</button>
+        <button type="button" class="keypad-btn" data-key="5">5</button>
+        <button type="button" class="keypad-btn" data-key="6">6</button>
+        <button type="button" class="keypad-btn" data-key="7">7</button>
+        <button type="button" class="keypad-btn" data-key="8">8</button>
+        <button type="button" class="keypad-btn" data-key="9">9</button>
+        <button type="button" class="keypad-btn" data-key="clear" style="font-size: 1rem; color: #EF4444;">CLEAR</button>
+        <button type="button" class="keypad-btn" data-key="0">0</button>
+        <button type="button" class="keypad-btn" data-key="back" style="font-size: 1rem;">⌫</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="admin-layout">
+    
+    <!-- Sidebar Navigation -->
+    <aside class="admin-sidebar">
+      <div class="sidebar-brand">
+        <img src="assets/logo.png" alt="The Digital Marketings" class="sidebar-logo">
+        <div class="sidebar-brand-text">
+          <span class="brand-title">TDM Agency</span>
+          <span class="brand-badge">⚡ Control Suite</span>
+        </div>
+      </div>
+
+      <nav class="sidebar-nav">
+        <button type="button" class="nav-item-btn active" data-tab="analytics">
+          <span class="nav-icon">📊</span>
+          <span>Analytics & Traffic</span>
+        </button>
+        <button type="button" class="nav-item-btn" data-tab="leads">
+          <span class="nav-icon">👥</span>
+          <span>Client Leads & CRM</span>
+          <span class="nav-item-badge" id="navLeadsBadge">24</span>
+        </button>
+        <button type="button" class="nav-item-btn" data-tab="blog">
+          <span class="nav-icon">✍️</span>
+          <span>Blog Manager</span>
+        </button>
+        <button type="button" class="nav-item-btn" data-tab="invoice">
+          <span class="nav-icon">🧾</span>
+          <span>Invoice Generator</span>
+        </button>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="live-status-card">
+          <div class="pulse-indicator"></div>
+          <div class="live-status-text">
+            Tracker Engine
+            <span>● Synchronized Live</span>
+          </div>
+        </div>
+        <a href="index.html" class="quick-site-link" target="_blank">
+          <span>🌐 View Public Website</span>
+        </a>
+      </div>
+    </aside>
+
+    <!-- Main Content Work Area -->
+    <main class="admin-main">
+      
+      <!-- Top Navigation Bar -->
+      <header class="admin-topbar">
+        <div class="topbar-left">
+          <button type="button" class="mobile-menu-toggle" id="mobileMenuToggle" aria-label="Toggle Sidebar Menu">
+            ☰
+          </button>
+          <div>
+            <h1 class="page-header-title" id="currentPageTitle">Analytics & Insights Dashboard</h1>
+            <p class="page-header-subtitle" id="currentPageSubtitle">Real-time website traffic, leads acquisition, and conversion tracking</p>
+          </div>
+        </div>
+        <div class="topbar-right">
+          <div class="time-display">
+            <span>🕒</span>
+            <span id="liveClock">Loading time...</span>
+          </div>
+          <button type="button" class="admin-btn-lock" id="lockScreenBtn">
+            <span>🔒 Lock Panel</span>
+          </button>
+        </div>
+      </header>
+
+      <!-- ====================================================================
+           VIEW 1: ANALYTICS & INSIGHTS
+           ==================================================================== -->
+      <section class="admin-content-view active" id="view-analytics">
+        
+        <!-- KPI Summary Cards -->
+        <div class="kpi-grid">
+          <div class="kpi-card">
+            <div class="kpi-header">
+              <span class="kpi-title">Total Page Views</span>
+              <div class="kpi-icon-badge kpi-icon-green">👁️</div>
+            </div>
+            <div class="kpi-value" id="kpiTotalViews">1,420</div>
+            <div class="kpi-meta">
+              <span class="kpi-trend-up">↑ +24.8%</span> vs last month
+            </div>
+          </div>
+
+          <div class="kpi-card">
+            <div class="kpi-header">
+              <span class="kpi-title">Total Client Leads</span>
+              <div class="kpi-icon-badge kpi-icon-blue">👥</div>
+            </div>
+            <div class="kpi-value" id="kpiTotalLeads">24</div>
+            <div class="kpi-meta">
+              <span class="kpi-trend-up">↑ +18.2%</span> Inbound inquiries
+            </div>
+          </div>
+
+          <div class="kpi-card">
+            <div class="kpi-header">
+              <span class="kpi-title">WhatsApp Direct Clicks</span>
+              <div class="kpi-icon-badge kpi-icon-wa">💬</div>
+            </div>
+            <div class="kpi-value" id="kpiWaClicks">164</div>
+            <div class="kpi-meta">
+              <span class="kpi-trend-up">↑ +32.0%</span> Direct chat triggers
+            </div>
+          </div>
+
+          <div class="kpi-card">
+            <div class="kpi-header">
+              <span class="kpi-title">Direct Phone Calls</span>
+              <div class="kpi-icon-badge kpi-icon-purple">📞</div>
+            </div>
+            <div class="kpi-value" id="kpiCallClicks">98</div>
+            <div class="kpi-meta">
+              <span class="kpi-trend-up">↑ +14.5%</span> Call buttons
+            </div>
+          </div>
+
+          <div class="kpi-card">
+            <div class="kpi-header">
+              <span class="kpi-title">Conversion Rate</span>
+              <div class="kpi-icon-badge kpi-icon-green">🎯</div>
+            </div>
+            <div class="kpi-value" id="kpiConversionRate">13.2%</div>
+            <div class="kpi-meta">
+              <span class="kpi-trend-up">⚡ High ROAS</span> Traffic-to-Lead
+            </div>
+          </div>
+        </div>
+
+        <!-- Charts Grid -->
+        <div class="charts-grid">
+          <div class="admin-card">
+            <div class="admin-card-header">
+              <div class="card-title-wrap">
+                <h3 class="admin-card-title">Weekly Traffic & Visitor Velocity</h3>
+                <p class="admin-card-subtitle">Daily user engagement and visits over the past 7 days</p>
+              </div>
+              <span class="nav-item-badge" style="background: rgba(210,250,21,0.1); color: var(--admin-primary);">Last 7 Days</span>
+            </div>
+            <div class="chart-container" id="weeklyTrafficChart">
+              <!-- Dynamically rendered bars -->
+            </div>
+          </div>
+
+          <div class="admin-card">
+            <div class="admin-card-header">
+              <div class="card-title-wrap">
+                <h3 class="admin-card-title">Acquisition Channels</h3>
+                <p class="admin-card-subtitle">Breakdown of inquiry sources</p>
+              </div>
+            </div>
+            <div class="breakdown-list" id="channelBreakdownList">
+              <!-- Dynamically rendered breakdown -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Live Events Stream -->
+        <div class="admin-card">
+          <div class="admin-card-header">
+            <div class="card-title-wrap">
+              <h3 class="admin-card-title">Live Website Activity Stream</h3>
+              <p class="admin-card-subtitle">Real-time interactions recorded across pages</p>
+            </div>
+          </div>
+          <div id="recentActivityFeed">
+            <!-- Dynamically populated -->
+          </div>
+        </div>
+
+      </section>
+
+      <!-- ====================================================================
+           VIEW 2: LEADS CRM
+           ==================================================================== -->
+      <section class="admin-content-view" id="view-leads">
+        <div class="admin-card" style="margin-bottom: 24px;">
+          <div class="admin-card-header" style="flex-wrap: wrap;">
+            <div class="card-title-wrap">
+              <h3 class="admin-card-title">Client Inquiries & Inbound CRM</h3>
+              <p class="admin-card-subtitle">Manage customer leads collected from forms, audit requests & consultations</p>
+            </div>
+            <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+              <input type="text" id="leadSearchInput" class="admin-input" placeholder="🔍 Search by name, phone, email..." style="width: 250px;">
+              <select id="leadStatusFilter" class="admin-select" style="width: 150px;">
+                <option value="all">All Statuses</option>
+                <option value="New">🟢 New</option>
+                <option value="Contacted">🔵 Contacted</option>
+                <option value="In Progress">🟡 In Progress</option>
+                <option value="Converted">🌟 Converted</option>
+                <option value="Lost">🔴 Lost</option>
+              </select>
+              <button type="button" class="btn-secondary" id="exportLeadsCsvBtn">
+                📥 Export CSV
+              </button>
+            </div>
+          </div>
+
+          <div class="table-responsive">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>Client Contact</th>
+                  <th>Phone & Website</th>
+                  <th>Service Requested</th>
+                  <th>Date & Page</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="leadsTableBody">
+                <!-- Dynamically populated rows -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Manual Lead Entry Box -->
+        <div class="admin-card">
+          <div class="admin-card-header">
+            <div class="card-title-wrap">
+              <h3 class="admin-card-title">➕ Add Manual Client Lead</h3>
+              <p class="admin-card-subtitle">Manually record a client from direct phone call, offline meeting, or referral</p>
+            </div>
+          </div>
+          <form id="manualLeadForm">
+            <div class="form-grid-3">
+              <div class="admin-form-group">
+                <label class="admin-label" for="manualName">Client Full Name *</label>
+                <input type="text" id="manualName" class="admin-input" required placeholder="e.g. Vikram Sharma">
+              </div>
+              <div class="admin-form-group">
+                <label class="admin-label" for="manualPhone">Phone / WhatsApp Number *</label>
+                <input type="tel" id="manualPhone" class="admin-input" required placeholder="+91 98765 43210">
+              </div>
+              <div class="admin-form-group">
+                <label class="admin-label" for="manualEmail">Email Address</label>
+                <input type="email" id="manualEmail" class="admin-input" placeholder="vikram@brand.com">
+              </div>
+            </div>
+            <div class="form-grid-2">
+              <div class="admin-form-group">
+                <label class="admin-label" for="manualService">Service of Interest</label>
+                <select id="manualService" class="admin-select">
+                  <option value="Fast Google Keyword Ranking & SEO">Fast Google Keyword Ranking & SEO</option>
+                  <option value="360° Omnichannel Marketing">360° Omnichannel Marketing</option>
+                  <option value="Google Ads & PPC Management">Google Ads & PPC Management</option>
+                  <option value="Meta Ads (Facebook & Instagram)">Meta Ads (Facebook & Instagram)</option>
+                  <option value="Google My Business (GMB 3-Pack)">Google My Business (GMB 3-Pack)</option>
+                  <option value="Website Optimization & Web Dev">Website Optimization & Web Dev</option>
+                </select>
+              </div>
+              <div class="admin-form-group">
+                <label class="admin-label" for="manualNotes">Discussion Notes</label>
+                <input type="text" id="manualNotes" class="admin-input" placeholder="Budget, target keywords, timeline...">
+              </div>
+            </div>
+            <button type="submit" class="btn-cyber" style="margin-top: 6px;">
+              <span>💾 Save Lead to CRM</span>
+            </button>
+          </form>
+        </div>
+      </section>
+
+      <!-- ====================================================================
+           VIEW 3: BLOG MANAGER & SEO GENERATOR
+           ==================================================================== -->
+      <section class="admin-content-view" id="view-blog">
+        <div class="blog-editor-layout">
+          
+          <!-- Left Column: Blog Editor Form -->
+          <div class="admin-card">
+            <div class="admin-card-header">
+              <div class="card-title-wrap">
+                <h3 class="admin-card-title">✍️ Compose New SEO Blog Post</h3>
+                <p class="admin-card-subtitle">Fill in article details, headings, and schema for fast Google indexing</p>
+              </div>
+            </div>
+
+            <div class="admin-form-group">
+              <label class="admin-label" for="blogTitle">Article Title (SEO H1) *</label>
+              <input type="text" id="blogTitle" class="admin-input" placeholder="e.g. How to Rank #1 on Google in 30 Days: The Ultimate Sprint Guide" value="How to Rank #1 on Google in 30 Days: Fast Sprint SEO Blueprint">
+              <div class="char-count" id="titleCharCount">62 / 60 characters</div>
+            </div>
+
+            <div class="form-grid-2">
+              <div class="admin-form-group">
+                <label class="admin-label" for="blogSlug">URL Slug (HTML File Name) *</label>
+                <input type="text" id="blogSlug" class="admin-input" placeholder="blog-rank-fast-google" value="blog-rank-fast-google-sprint">
+              </div>
+              <div class="admin-form-group">
+                <label class="admin-label" for="blogCategory">Category</label>
+                <select id="blogCategory" class="admin-select">
+                  <option value="SEO & Keyword Ranking">SEO & Keyword Ranking</option>
+                  <option value="360° Digital Growth">360° Digital Growth</option>
+                  <option value="Google Ads & PPC">Google Ads & PPC</option>
+                  <option value="Meta Ads & Social">Meta Ads & Social</option>
+                  <option value="Local Maps & GMB">Local Maps & GMB</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-grid-3">
+              <div class="admin-form-group">
+                <label class="admin-label" for="blogAuthor">Author</label>
+                <input type="text" id="blogAuthor" class="admin-input" value="Sabir Ajmeri - Founder & CEO">
+              </div>
+              <div class="admin-form-group">
+                <label class="admin-label" for="blogReadTime">Read Time</label>
+                <input type="text" id="blogReadTime" class="admin-input" value="6 min read">
+              </div>
+              <div class="admin-form-group">
+                <label class="admin-label" for="blogKeywords">Focus Keywords</label>
+                <input type="text" id="blogKeywords" class="admin-input" value="fast seo ranking, google page 1, 360 marketing">
+              </div>
+            </div>
+
+            <div class="admin-form-group">
+              <label class="admin-label" for="blogExcerpt">Meta Description (Snippet Hook) *</label>
+              <textarea id="blogExcerpt" class="admin-textarea" style="min-height: 80px;" placeholder="Compelling 140-160 character description designed to increase search clicks...">Discover our proven 30-day SEO sprint formula that outranks competitors fast. Step-by-step keyword mapping, meta title CTR engineering, and high-authority links.</textarea>
+              <div class="char-count good" id="descCharCount">160 / 160 characters ✓ (Optimal)</div>
+            </div>
+
+            <div class="admin-form-group">
+              <label class="admin-label" for="blogContent">Blog Body Content (HTML / Text)</label>
+              <textarea id="blogContent" class="admin-textarea" style="min-height: 220px;" placeholder="Write headings, paragraphs, bullet points, and actionable tips..."></textarea>
+            </div>
+
+            <div style="display: flex; gap: 12px; margin-top: 10px;">
+              <button type="button" class="btn-cyber" id="generateBlogHtmlBtn">
+                <span>⚡ Build & Preview Complete HTML</span>
+              </button>
+              <button type="button" class="btn-outline-cyber" id="downloadBlogHtmlFileBtn">
+                <span>📥 Download .html File</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Right Column: Live Google SERP Snippet Preview -->
+          <div style="display: flex; flex-direction: column; gap: 24px;">
+            <div class="admin-card">
+              <div class="admin-card-header">
+                <div class="card-title-wrap">
+                  <h3 class="admin-card-title">🔍 Live Google SERP Snippet Preview</h3>
+                  <p class="admin-card-subtitle">Exact desktop & mobile search result simulation</p>
+                </div>
+              </div>
+
+              <div class="serp-preview-box">
+                <div class="serp-brand">
+                  <img src="assets/favicon.svg" class="serp-favicon" alt="icon">
+                  <span class="serp-site-name">The Digital Marketings</span>
+                </div>
+                <div class="serp-url" id="serpPreviewUrl">https://thedigitalmarketings.com › blog-rank-fast-google-sprint.html</div>
+                <div class="serp-title" id="serpPreviewTitle">How to Rank #1 on Google in 30 Days: Fast Sprint SEO Blueprint | The Digital Marketings</div>
+                <div class="serp-snippet" id="serpPreviewDesc">Discover our proven 30-day SEO sprint formula that outranks competitors fast. Step-by-step keyword mapping, meta title CTR engineering, and high-authority links.</div>
+              </div>
+
+              <div style="margin-top: 20px; background: rgba(255,255,255,0.02); border: 1px solid var(--admin-border); border-radius: 8px; padding: 16px;">
+                <h4 style="font-size: 0.9rem; color: var(--admin-primary); margin-bottom: 8px;">💡 SEO Optimization Checklist</h4>
+                <ul style="font-size: 0.82rem; color: var(--admin-text-body); display: flex; flex-direction: column; gap: 6px;">
+                  <li>✅ Includes Primary Keyword in Title Tag</li>
+                  <li>✅ Meta Description within 130-160 character sweet spot</li>
+                  <li>✅ Clean Kebab-case URL slug structure</li>
+                  <li>✅ Schema BlogPosting JSON-LD automatically injected</li>
+                  <li>✅ Built-in In-Article WhatsApp CTA trigger</li>
+                </ul>
+              </div>
+            </div>
+
+            <!-- Existing Blogs Reference -->
+            <div class="admin-card">
+              <div class="admin-card-header">
+                <div class="card-title-wrap">
+                  <h3 class="admin-card-title">📚 Published Blogs in Workspace</h3>
+                  <p class="admin-card-subtitle">6 Live high-ranking articles</p>
+                </div>
+              </div>
+              <div style="display: flex; flex-direction: column; gap: 8px; font-size: 0.85rem;">
+                <a href="blog-30-day-seo-ranking.html" target="_blank" style="color: var(--admin-primary);">📄 blog-30-day-seo-ranking.html</a>
+                <a href="blog-360-omnichannel-marketing.html" target="_blank" style="color: var(--admin-primary);">📄 blog-360-omnichannel-marketing.html</a>
+                <a href="blog-ahmedabad-local-seo-google-maps.html" target="_blank" style="color: var(--admin-primary);">📄 blog-ahmedabad-local-seo-google-maps.html</a>
+                <a href="blog-google-ads-vs-organic-seo.html" target="_blank" style="color: var(--admin-primary);">📄 blog-google-ads-vs-organic-seo.html</a>
+                <a href="blog-mobile-website-speed-seo.html" target="_blank" style="color: var(--admin-primary);">📄 blog-mobile-website-speed-seo.html</a>
+                <a href="blog-seo-titles-meta-descriptions.html" target="_blank" style="color: var(--admin-primary);">📄 blog-seo-titles-meta-descriptions.html</a>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Export Code Modal -->
+        <div id="blogExportModal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); backdrop-filter: blur(10px); z-index: 9999; align-items: center; justify-content: center; padding: 24px;">
+          <div class="admin-card" style="width: 100%; max-width: 800px; max-height: 85vh; display: flex; flex-direction: column;">
+            <div class="admin-card-header">
+              <h3 class="admin-card-title">Generated Full HTML Blog File</h3>
+              <button type="button" class="btn-secondary" onclick="document.getElementById('blogExportModal').style.display='none'">✕ Close</button>
+            </div>
+            <textarea id="generatedHtmlCode" class="admin-textarea" style="flex: 1; min-height: 400px; font-family: monospace; font-size: 0.82rem;" readonly></textarea>
+            <div style="display: flex; gap: 12px; margin-top: 16px;">
+              <button type="button" class="btn-cyber" id="copyBlogHtmlCodeBtn">📋 Copy HTML Code</button>
+              <button type="button" class="btn-outline-cyber" onclick="document.getElementById('downloadBlogHtmlFileBtn').click()">📥 Download File</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ====================================================================
+           VIEW 4: PROFESSIONAL INVOICE GENERATOR
+           ==================================================================== -->
+      <section class="admin-content-view" id="view-invoice">
+        <div class="invoice-toolbar no-print">
+          <div style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap;">
+            <label class="admin-label" style="margin: 0;">Currency:</label>
+            <select id="invCurrencySelect" class="admin-select" style="width: 120px;">
+              <option value="₹">₹ INR (India)</option>
+              <option value="$">$ USD (Global)</option>
+              <option value="AED">AED (Dubai)</option>
+              <option value="€">€ EUR (Europe)</option>
+              <option value="£">£ GBP (UK)</option>
+            </select>
+
+            <label class="admin-label" style="margin: 0;">Discount %:</label>
+            <input type="number" id="invDiscountPercent" class="admin-input" value="0" min="0" max="100" style="width: 80px;">
+          </div>
+
+          <div style="display: flex; gap: 12px;">
+            <button type="button" class="btn-cyber" id="invPrintBtn">
+              <span>🖨️ Print / Save as PDF</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Printable Luxury Invoice Paper Canvas -->
+        <div class="invoice-paper" id="printableInvoice">
+          
+          <!-- Invoice Header -->
+          <div class="inv-header">
+            <div class="inv-brand-col">
+              <img src="assets/logo.png" alt="The Digital Marketings" class="inv-logo-img">
+              <div class="inv-company-name">The Digital Marketings</div>
+              <div class="inv-address-line">
+                Ahmedabad HQ, Gujarat, India • Pin 380001<br>
+                Founder & CEO: Sabir Ajmeri<br>
+                Phone: +91 9316954389 • Email: infothedigitalmarketings@gmail.com<br>
+                Website: thedigitalmarketings.com
+              </div>
+            </div>
+            <div class="inv-meta-col">
+              <div class="inv-badge-title">TAX INVOICE</div>
+              <div class="inv-meta-item">Invoice #: <strong contenteditable="true">TDM-INV-2026-042</strong></div>
+              <div class="inv-meta-item">Invoice Date: <strong contenteditable="true">14 Sep 2026</strong></div>
+              <div class="inv-meta-item">Due Date: <strong contenteditable="true">21 Sep 2026</strong></div>
+              <div class="inv-meta-item">GSTIN / Tax ID: <strong contenteditable="true">24AAAAA0000A1Z5</strong></div>
+            </div>
+          </div>
+
+          <!-- Billed To / Client Info -->
+          <div class="inv-bill-row">
+            <div class="inv-bill-col">
+              <h4>Billed To (Client Details)</h4>
+              <div class="inv-bill-name" contenteditable="true">Patel Textile Exporters Pvt Ltd</div>
+              <div class="inv-bill-text" contenteditable="true">Attn: Mr. Rajesh Patel (Managing Director)</div>
+              <div class="inv-bill-text" contenteditable="true">S.G. Highway, Ahmedabad, Gujarat, India</div>
+              <div class="inv-bill-text" contenteditable="true">Phone: +91 98250 12345 • rajesh@pateltextiles.com</div>
+            </div>
+            <div class="inv-bill-col">
+              <h4>Project & Payment Terms</h4>
+              <div class="inv-bill-text"><strong>Project:</strong> 360° Digital Marketing & Fast Google SEO Sprint</div>
+              <div class="inv-bill-text"><strong>Payment Mode:</strong> Bank NEFT / RTGS / UPI</div>
+              <div class="inv-bill-text"><strong>Term:</strong> Net 7 Days from invoice date</div>
+            </div>
+          </div>
+
+          <!-- Line Items Table -->
+          <table class="inv-table">
+            <thead>
+              <tr>
+                <th>Service Description</th>
+                <th>Qty</th>
+                <th>Rate</th>
+                <th>Tax %</th>
+                <th>Amount</th>
+                <th class="no-print"></th>
+              </tr>
+            </thead>
+            <tbody id="invoiceItemsTableBody">
+              <!-- Dynamically rendered rows -->
+            </tbody>
+          </table>
+
+          <div style="margin-bottom: 20px;" class="no-print">
+            <button type="button" class="btn-outline-cyber inv-add-row-btn" id="invAddRowBtn">
+              ➕ Add Service Line Item
+            </button>
+          </div>
+
+          <!-- Invoice Summary & Bank Details -->
+          <div class="inv-summary-grid">
+            <div class="inv-bank-box">
+              <h5>Official Bank Transfer / UPI Details</h5>
+              <div><strong>Account Name:</strong> The Digital Marketings</div>
+              <div><strong>Bank Name:</strong> HDFC Bank Ltd</div>
+              <div><strong>Account No:</strong> 50200084729104</div>
+              <div><strong>IFSC Code:</strong> HDFC0001234</div>
+              <div><strong>UPI ID:</strong> 9316954389@paytm / sabirajmeri@okhdfcbank</div>
+              <div style="margin-top: 8px; font-size: 0.75rem; color: #64748B;">
+                * Please share screenshot of transaction to +91 9316954389 after payment.
+              </div>
+            </div>
+
+            <div class="inv-calc-box">
+              <div class="inv-calc-row">
+                <span>Subtotal:</span>
+                <span id="invSubtotalVal">₹ 50,000.00</span>
+              </div>
+              <div class="inv-calc-row">
+                <span>GST / Tax Total:</span>
+                <span id="invTaxVal">₹ 9,000.00</span>
+              </div>
+              <div class="inv-calc-row grand-total">
+                <span>Grand Total:</span>
+                <span id="invGrandTotalVal">₹ 59,000.00</span>
+              </div>
+              <div class="inv-in-words" id="invAmountInWords">
+                INR Fifty Nine Thousand Only (₹)
+              </div>
+            </div>
+          </div>
+
+          <!-- Footer Signature Note -->
+          <div style="margin-top: 40px; padding-top: 20px; border-top: 1px solid #E2E8F0; display: flex; justify-content: space-between; align-items: flex-end; font-size: 0.8rem; color: #64748B;">
+            <div>
+              <p>Thank you for choosing <strong>The Digital Marketings</strong> as your growth partner!</p>
+              <p>For support, call +91 9316954389 or email infothedigitalmarketings@gmail.com</p>
+            </div>
+            <div style="text-align: right;">
+              <div style="font-family: 'Outfit', sans-serif; font-weight: 800; color: #0F172A; font-size: 0.95rem;">Sabir Ajmeri</div>
+              <div>Authorized Signatory</div>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <script src="admin.js"></script>
+</body>
+</html>
+

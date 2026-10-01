@@ -1,0 +1,1074 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+  <title>TDM Brand Instagram Posts Studio (1080×1350) | The Digital Marketings</title>
+  <meta name="description" content="Official 10-Post Instagram Campaign Generator & Exporter for The Digital Marketings (1080x1350 HD).">
+  <link rel="icon" type="image/png" href="assets/logo.png">
+  <link rel="shortcut icon" type="image/png" href="assets/logo.png">
+  <link rel="apple-touch-icon" href="assets/logo.png">
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --tdm-neon: #D2FA15;
+      --tdm-neon-hover: #E2FF38;
+      --tdm-neon-glow: rgba(210, 250, 21, 0.4);
+      --tdm-dark: #07090E;
+      --tdm-dark-elevated: #0E131F;
+      --tdm-card: #121826;
+      --tdm-card-hover: #182032;
+      --tdm-border: rgba(210, 250, 21, 0.25);
+      --tdm-border-subtle: rgba(255, 255, 255, 0.08);
+      --tdm-text-main: #FFFFFF;
+      --tdm-text-muted: #94A3B8;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    
+    html, body {
+      background-color: var(--tdm-dark);
+      color: var(--tdm-text-main);
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      min-height: 100vh;
+      display: block !important;
+      overflow-x: hidden;
+    }
+
+    /* Top Sticky App Header */
+    .studio-app-header {
+      width: 100%;
+      background: rgba(10, 14, 22, 0.95);
+      border-bottom: 1px solid var(--tdm-border);
+      padding: 16px 32px;
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: space-between;
+      backdrop-filter: blur(15px);
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      box-shadow: 0 4px 25px rgba(0, 0, 0, 0.5);
+    }
+
+    .brand-group {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .brand-logo-img {
+      height: 44px;
+      width: auto;
+      object-fit: contain;
+    }
+
+    .brand-badge {
+      background: rgba(210, 250, 21, 0.12);
+      border: 1px solid var(--tdm-neon);
+      color: var(--tdm-neon);
+      padding: 4px 14px;
+      border-radius: 9999px;
+      font-family: 'Outfit', sans-serif;
+      font-size: 0.76rem;
+      font-weight: 800;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      box-shadow: 0 0 10px rgba(210, 250, 21, 0.15);
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    /* Main Container */
+    .studio-container {
+      max-width: 1440px;
+      margin: 0 auto;
+      padding: 28px;
+      display: grid;
+      grid-template-columns: 380px 1fr;
+      gap: 28px;
+    }
+
+    @media (max-width: 1100px) {
+      .studio-container {
+        grid-template-columns: 1fr;
+      }
+      .studio-app-header {
+        padding: 14px 20px;
+      }
+    }
+
+    /* Left Sidebar: 10 Posts List */
+    .posts-nav-panel {
+      background: var(--tdm-card);
+      border: 1px solid var(--tdm-border-subtle);
+      border-radius: 18px;
+      padding: 22px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      height: fit-content;
+      max-height: calc(100vh - 120px);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    }
+
+    .posts-nav-title {
+      font-family: 'Outfit', sans-serif;
+      font-size: 1.15rem;
+      font-weight: 800;
+      color: #FFFFFF;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-bottom: 14px;
+      border-bottom: 1px solid var(--tdm-border-subtle);
+    }
+
+    .posts-nav-list-scroll {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      overflow-y: auto;
+      padding-right: 4px;
+    }
+
+    .posts-nav-list-scroll::-webkit-scrollbar {
+      width: 6px;
+    }
+    .posts-nav-list-scroll::-webkit-scrollbar-thumb {
+      background: rgba(210, 250, 21, 0.2);
+      border-radius: 3px;
+    }
+
+    .post-nav-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 14px;
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid var(--tdm-border-subtle);
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+      text-align: left;
+    }
+
+    .post-nav-item:hover {
+      background: rgba(210, 250, 21, 0.06);
+      border-color: rgba(210, 250, 21, 0.4);
+      transform: translateX(4px);
+    }
+
+    .post-nav-item.active {
+      background: rgba(210, 250, 21, 0.12);
+      border-color: var(--tdm-neon);
+      box-shadow: 0 0 16px rgba(210, 250, 21, 0.15);
+    }
+
+    .post-num-badge {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      background: #000000;
+      border: 1px solid var(--tdm-neon);
+      color: var(--tdm-neon);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Outfit', sans-serif;
+      font-weight: 900;
+      font-size: 0.82rem;
+      flex-shrink: 0;
+    }
+
+    .post-item-info {
+      flex: 1;
+      overflow: hidden;
+    }
+
+    .post-item-category {
+      font-size: 0.68rem;
+      font-weight: 800;
+      color: var(--tdm-neon);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .post-item-title {
+      font-size: 0.84rem;
+      font-weight: 700;
+      color: #F8FAFC;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      margin-top: 2px;
+    }
+
+    /* Main Stage: Canvas + Controls */
+    .stage-card {
+      background: var(--tdm-card);
+      border: 1px solid var(--tdm-border-subtle);
+      border-radius: 18px;
+      padding: 26px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 22px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+    }
+
+    .stage-top-bar {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--tdm-border-subtle);
+      padding-bottom: 18px;
+      flex-wrap: wrap;
+      gap: 14px;
+    }
+
+    .canvas-preview-box {
+      width: 100%;
+      max-width: 490px;
+      aspect-ratio: 4 / 5;
+      background: #000000;
+      border-radius: 18px;
+      overflow: hidden;
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.9), 0 0 35px rgba(210, 250, 21, 0.15);
+      border: 1.5px solid var(--tdm-neon);
+      position: relative;
+    }
+
+    #postCanvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+      object-fit: contain;
+    }
+
+    /* Buttons */
+    .btn-tdm-neon {
+      background: var(--tdm-neon);
+      color: #000000;
+      font-family: 'Outfit', sans-serif;
+      font-weight: 800;
+      font-size: 0.9rem;
+      padding: 10px 22px;
+      border-radius: 9999px;
+      border: none;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s ease;
+      box-shadow: 0 0 20px rgba(210, 250, 21, 0.25);
+      text-decoration: none;
+    }
+
+    .btn-tdm-neon:hover {
+      background: var(--tdm-neon-hover);
+      box-shadow: 0 0 30px var(--tdm-neon);
+      transform: translateY(-2px);
+    }
+
+    .btn-tdm-neon:active {
+      transform: scale(0.97);
+    }
+
+    .btn-tdm-outline {
+      background: transparent;
+      border: 1px solid var(--tdm-neon);
+      color: var(--tdm-neon);
+      font-family: 'Outfit', sans-serif;
+      font-weight: 700;
+      font-size: 0.85rem;
+      padding: 10px 18px;
+      border-radius: 9999px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s ease;
+      text-decoration: none;
+    }
+
+    .btn-tdm-outline:hover {
+      background: rgba(210, 250, 21, 0.1);
+      transform: translateY(-1px);
+    }
+
+    /* Caption Card */
+    .caption-box {
+      width: 100%;
+      background: rgba(0, 0, 0, 0.4);
+      border: 1px solid var(--tdm-border-subtle);
+      border-radius: 14px;
+      padding: 20px;
+    }
+
+    .caption-header-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+
+    .caption-textarea {
+      width: 100%;
+      height: 150px;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--tdm-border-subtle);
+      border-radius: 10px;
+      padding: 14px;
+      color: #CBD5E1;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 0.88rem;
+      line-height: 1.6;
+      resize: none;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- App Header -->
+  <header class="studio-app-header">
+    <div class="brand-group">
+      <a href="index.html" style="display: flex; align-items: center;">
+        <img src="assets/logo.png" alt="The Digital Marketings" class="brand-logo-img">
+      </a>
+      <span class="brand-badge">Official 10-Post Instagram Studio</span>
+    </div>
+    <div class="header-actions">
+      <a href="index.html" class="btn-tdm-outline">
+        <span>← Back to Website</span>
+      </a>
+      <button type="button" class="btn-tdm-neon" id="downloadBatchAllBtn">
+        <span>📦 Download All 10 Posts</span>
+      </button>
+    </div>
+  </header>
+
+  <div class="studio-container">
+    
+    <!-- Left Navigation: 10 Posts -->
+    <aside class="posts-nav-panel">
+      <div class="posts-nav-title">
+        <span>📋 10 Agency Brand Posts</span>
+        <span style="font-size: 0.74rem; color: var(--tdm-neon); font-weight: 700;">1080×1350 px</span>
+      </div>
+      
+      <div class="posts-nav-list-scroll" id="postsNavList">
+        <!-- Dynamically rendered 10 items -->
+      </div>
+    </aside>
+
+    <!-- Main Canvas Studio Stage -->
+    <main class="stage-card">
+      
+      <div class="stage-top-bar">
+        <div>
+          <div style="font-size: 0.75rem; font-weight: 800; color: var(--tdm-neon); text-transform: uppercase;" id="currentPostCategory">
+            📍 GOOGLE MY BUSINESS (GMB)
+          </div>
+          <h2 style="font-family: 'Outfit', sans-serif; font-size: 1.35rem; margin: 4px 0 0 0;" id="currentPostHeading">
+            Rank #1 on Google Maps & 10x Your Calls
+          </h2>
+        </div>
+
+        <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+          <button type="button" class="btn-tdm-outline" id="prevPostBtn">← Prev</button>
+          <span style="font-size: 0.85rem; font-weight: 700; color: #94A3B8;" id="postCounterLabel">Post 1 of 10</span>
+          <button type="button" class="btn-tdm-outline" id="nextPostBtn">Next →</button>
+          <button type="button" class="btn-tdm-neon" id="downloadCurrentPostBtn">
+            <span>📥 Download 1080×1350 PNG</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Live Canvas Render Box -->
+      <div class="canvas-preview-box">
+        <canvas id="postCanvas" width="1080" height="1350"></canvas>
+      </div>
+
+      <!-- Instagram Ready Caption & Hashtags -->
+      <div class="caption-box">
+        <div class="caption-header-row">
+          <span style="font-weight: 800; font-size: 0.92rem; color: var(--tdm-neon); display: flex; align-items: center; gap: 6px;">
+            <span>✨</span> Instagram Caption & Viral Hashtags
+          </span>
+          <button type="button" class="btn-tdm-outline" id="copyCaptionBtn" style="padding: 5px 14px; font-size: 0.78rem;">
+            📋 Copy Caption
+          </button>
+        </div>
+        <textarea id="captionTextarea" class="caption-textarea" readonly></textarea>
+      </div>
+
+    </main>
+
+  </div>
+
+  <script>
+    /**
+     * 10 COMPLETE HIGH-CONVERTING INSTAGRAM POSTS DATA (1080x1350)
+     * For The Digital Marketings (Phone: +91 9316954389 | thedigitalmarketings.com)
+     */
+    const tdmBrandPosts = [
+      {
+        id: 1,
+        category: '📍 GOOGLE MY BUSINESS (GMB)',
+        title: 'Rank #1 on Google Maps',
+        badge: 'LOCAL SEO DOMINANCE 2026',
+        headline: 'Rank #1 on Google Maps & Get 10x More Phone Calls',
+        subheadline: 'When nearby customers search for your service, do they find YOU or your competitors?',
+        statBadge: '📈 +340% More Calls & Footfall',
+        bullet1: '⭐ 100% GMB Profile & Geotag Optimization',
+        bullet2: '🗺️ Dominate the Google 3-Pack Map Results',
+        bullet3: '💬 Automated 5-Star Review Generation System',
+        bullet4: '📞 Direct Calls, Directions & Website Clicks',
+        cta: 'Claim Free Google Map Audit 💬',
+        caption: `📍 Stop losing local customers to your competitors! 🚀
+
+Did you know that 86% of customers check Google Maps before choosing a local service or showroom?
+
+If your business isn't in the Top 3 Google Map Pack, you are losing 10x calls and inquiries daily!
+
+Here is how The Digital Marketings ranks your business:
+✔ 100% GMB Profile & Geotag Optimization
+✔ Local Citation & NAP Consistency
+✔ Automated 5-Star Review Engine
+✔ Weekly Local Posts & Search Authority
+
+🔥 Claim your Free Google Maps Ranking Audit today!
+📞 Call / WhatsApp: +91 9316954389
+🌐 Visit: thedigitalmarketings.com
+
+#GoogleMyBusiness #GMBRanking #LocalSEO #AhmedabadBusiness #TheDigitalMarketings #GoogleMapsSEO #LocalMarketing #SEOAhmedabad #SmallBusinessGrowth`
+      },
+      {
+        id: 2,
+        category: '📱 SOCIAL MEDIA MARKETING (SMM)',
+        title: 'Turn Followers into Lifetime Clients',
+        badge: 'ORGANIC BRAND AUTHORITY',
+        headline: 'Turn Casual Followers into High-Paying Lifetime Clients',
+        subheadline: 'Stop posting random graphics. Build an omnipresent social brand that commands authority.',
+        statBadge: '🚀 5.8x Higher Brand Recall',
+        bullet1: '🎯 Viral Hook & Scroll-Stopping Video Strategy',
+        bullet2: '🎨 Premium Branded Visuals & Infographics',
+        bullet3: '💬 DM Automation to Convert Inquiries Directly',
+        bullet4: '📊 Data-Backed Content Calendar & Growth Metrics',
+        cta: 'Scale Your Social Brand Today 💬',
+        caption: `📱 Stop posting random photos that get 0 sales! 💡
+
+Social media is not just about likes — it is your 24/7 digital storefront to convert strangers into high-paying clients.
+
+At The Digital Marketings, our SMM framework includes:
+✨ Scroll-stopping viral hooks & reels
+✨ High-converting aesthetic visual identity
+✨ Direct message automation for instant lead qualification
+✨ Consistent data-driven posting schedule
+
+Ready to build an unstoppable brand?
+📞 WhatsApp: +91 9316954389
+🌐 Website: thedigitalmarketings.com
+
+#SocialMediaMarketing #SMM #InstagramGrowth #BrandBuilding #ContentMarketing #DigitalAgencyAhmedabad #TheDigitalMarketings #ViralMarketing`
+      },
+      {
+        id: 3,
+        category: '⚡ META ADS (FACEBOOK & INSTAGRAM)',
+        title: 'High-ROAS Meta Ad Campaigns',
+        badge: 'HIGH-CONVERTING AD FUNNEL',
+        headline: 'High-ROAS Meta Ads Engineered for Direct Leads & Sales',
+        subheadline: 'Stop burning money on "Boost Post". Run laser-targeted multi-stage ad funnels.',
+        statBadge: '🔥 4.2x Average ROAS Generated',
+        bullet1: '🎯 Hyper-Targeted AI Lookalike Audience Profiling',
+        bullet2: '🔥 10+ Creative Video & Carousel Angles (Lowest CPL)',
+        bullet3: '🔄 Dynamic Retargeting for 98% Unconverted Visitors',
+        bullet4: '💎 Instant Direct WhatsApp & Lead Form Inquiries',
+        cta: 'Launch High-ROAS Meta Ads 💬',
+        caption: `⚡ Are your Facebook & Instagram ads burning budget without results? 🔥
+
+The mistake 90% of businesses make is clicking "Boost Post" instead of running full-funnel performance marketing.
+
+Here is how we generate 4.2x+ ROAS at The Digital Marketings:
+🎯 Laser AI Audience Targeting & Lookalike Models
+🎯 Multi-angle creative testing (Carousels, Video Hooks, UGC)
+🎯 Dynamic Retargeting to convert cart abandoners
+🎯 Direct WhatsApp Lead Generation with verified intent
+
+Ready to scale your revenue?
+📞 Call / WhatsApp: +91 9316954389
+🌐 Visit: thedigitalmarketings.com
+
+#MetaAds #FacebookAds #InstagramAds #PerformanceMarketing #ROAS #LeadGeneration #TheDigitalMarketings #AdAgencyAhmedabad #ScaleBusiness`
+      },
+      {
+        id: 4,
+        category: '🎯 GOOGLE ADS (SEARCH & PPC)',
+        title: 'Capture High Buyer-Intent Leads',
+        badge: 'PAGE #1 IN 24 HOURS',
+        headline: 'Capture Ready-to-Buy Clients Right When They Search',
+        subheadline: 'Be on Page #1 of Google in 24 hours. Zero wasted ad budget with exact buyer intent.',
+        statBadge: '⚡ Instant Google Page #1 Placement',
+        bullet1: '🔍 Exact Buyer-Intent Keyword Bidding Strategy',
+        bullet2: '🛡️ Negative Keyword Filtering (Zero Spam Traffic)',
+        bullet3: '📄 High-Converting Custom Landing Pages (25%+ Opt-in)',
+        bullet4: '📊 AI Smart Bidding for Maximum Qualified Phone Calls',
+        cta: 'Launch High-Intent Google Ads 💬',
+        caption: `🎯 When someone searches for your service on Google right now, who gets the client?
+
+Google Search Ads put your business in front of customers who already have their credit card in hand.
+
+Why choose The Digital Marketings for Google PPC?
+✔ Exact high-intent keyword targeting
+✔ Aggressive negative keyword filtering (no wasted ad spend)
+✔ Fast-loading, conversion-optimized landing pages
+✔ Constant ROI tracking and lower cost-per-lead
+
+Start getting hot inbound leads today!
+📞 WhatsApp: +91 9316954389
+🌐 thedigitalmarketings.com
+
+#GoogleAds #PPC #SearchMarketing #GooglePPC #InboundLeads #AhmedabadAgency #TheDigitalMarketings #DigitalMarketingROI`
+      },
+      {
+        id: 5,
+        category: '💎 SEARCH ENGINE OPTIMIZATION (SEO)',
+        title: 'Why SEO is the Ultimate Asset',
+        badge: 'PASSIVE ORGANIC TRAFFIC',
+        headline: 'Why SEO is the #1 Long-Term Digital Asset for Your Brand',
+        subheadline: 'Paid ads stop working the second you stop paying. SEO brings compounding free leads 24/7 forever.',
+        statBadge: '💎 10x Higher ROI vs Cold Paid Ads',
+        bullet1: '🏆 100% Free Organic Traffic from High Google Rankings',
+        bullet2: '🛡️ Unshakeable Industry Authority & 5-Star Trust',
+        bullet3: '📈 Compounding Digital Equity that Grows Every Month',
+        bullet4: '👑 Permanently Outrank Your Local & National Competitors',
+        cta: 'Claim Free 30-Day SEO Audit 💬',
+        caption: `💎 Paid ads rent traffic. SEO OWNS the traffic! 🚀
+
+If you want predictable, high-value clients searching for you every single day without paying for every click, SEO is your greatest competitive weapon.
+
+The Power of Google Page #1 Ranking:
+✔ 24/7 passive inbound client inquiries
+✔ 10x higher trust and conversion rate
+✔ Compounding ROI that stays forever
+
+Let Founder Sabir Ajmeri build your 30-Day SEO Roadmap:
+📞 WhatsApp: +91 9316954389
+🌐 thedigitalmarketings.com
+
+#SEO #SearchEngineOptimization #OrganicTraffic #GoogleRanking #SEOStrategy #TheDigitalMarketings #SEOAhmedabad #CompoundingGrowth`
+      },
+      {
+        id: 6,
+        category: '📚 COMPLETE SEO ARCHITECTURE',
+        title: 'The 4 Core Types of SEO',
+        badge: '360° RANKING BLUEPRINT',
+        headline: 'The 4 Types of SEO You Must Master to Dominate Google',
+        subheadline: 'Missing even one of these 4 pillars will hold your website back from ranking on Page #1.',
+        statBadge: '👑 Complete 4-Pillar Mastery',
+        bullet1: '1️⃣ ON-PAGE SEO: Title tags, H1-H3, intent & internal links',
+        bullet2: '2️⃣ OFF-PAGE SEO: High-authority backlinks & digital PR',
+        bullet3: '3️⃣ TECHNICAL SEO: Site speed <1.5s, mobile schema & crawl',
+        bullet4: '4️⃣ LOCAL SEO: Google Business Profile & 3-Pack Maps',
+        cta: 'Get Complete 4-Pillar SEO Audit 💬',
+        caption: `📚 What are the 4 Types of SEO you need to rank on Google in 2026? 🔍
+
+1️⃣ On-Page SEO: Optimizing headlines, keyword intent, meta descriptions, image alt tags and internal links.
+2️⃣ Off-Page SEO: Building high-domain authority backlinks, guest posts and brand citations.
+3️⃣ Technical SEO: Core Web Vitals, speed optimization (<1.5s), SSL, XML sitemaps and clean structured schema.
+4️⃣ Local SEO: Google Business Profile (GMB) optimization, local map pack rankings and reviews.
+
+Need all 4 pillars executed for your website?
+📞 WhatsApp: +91 9316954389
+🌐 thedigitalmarketings.com
+
+#TypesOfSEO #TechnicalSEO #OnPageSEO #OffPageSEO #LocalSEO #SEOTips #TheDigitalMarketings #DigitalMarketingGuide`
+      },
+      {
+        id: 7,
+        category: '🛠️ PROFESSIONAL SEO TOOLKIT',
+        title: 'Top 7 Essential SEO Tools',
+        badge: 'ENTERPRISE SOFTWARE STACK',
+        headline: 'Top 7 SEO Tools We Use to Rank Websites on Google Page #1',
+        subheadline: 'The exact enterprise software stack behind our client success stories and top rankings.',
+        statBadge: '⚙️ Enterprise SEO Stack',
+        bullet1: '🟡 AHREFS: Competitor backlink & keyword difficulty analysis',
+        bullet2: '🟠 SEMRUSH: Domain organic research & keyword gap finder',
+        bullet3: '🔵 GOOGLE SEARCH CONSOLE: Live crawl, CTR & search queries',
+        bullet4: '🟢 SCREAMING FROG + SURFERSEO + MOZ + UBERSUGGEST',
+        cta: 'Let Us Handle Your SEO Stack 💬',
+        caption: `🛠️ Want to know the exact tools top SEO agencies use to dominate Google? 📈
+
+Here are the Top 7 SEO Tools we use at The Digital Marketings:
+1. 🟡 Ahrefs — Competitor backlink intelligence & keyword research
+2. 🟠 SEMrush — Full domain organic tracking & keyword gap discovery
+3. 🔵 Google Search Console — Live Google indexation, impressions & CTR
+4. 🟢 Screaming Frog — Technical site audit & broken link crawler
+5. 🟣 SurferSEO — AI-assisted on-page content NLP optimization
+6. 🔴 Moz Pro — Domain Authority (DA) monitoring
+7. ⚡ Ubersuggest — Fast content ideation & local search volume
+
+Save this post 🔖 for your SEO reference!
+📞 WhatsApp: +91 9316954389
+🌐 thedigitalmarketings.com
+
+#SEOTools #Ahrefs #SEMrush #GoogleSearchConsole #SurferSEO #ScreamingFrog #SEOTips #DigitalMarketingTools #TheDigitalMarketings`
+      },
+      {
+        id: 8,
+        category: '✅ ON-PAGE SEO CHECKLIST',
+        title: '5-Step On-Page SEO Checklist',
+        badge: 'RANK FASTER IN 2026',
+        headline: 'The Ultimate 5-Step On-Page SEO Checklist for 2026',
+        subheadline: 'Follow these 5 proven rules before hitting publish to ensure top Google placement.',
+        statBadge: '🎯 99% SEO Hygiene Score',
+        bullet1: '✔ Target Keyword in Clean URL Slug & H1 Tag',
+        bullet2: '✔ High-CTR Meta Title (<60 chars) & Description (<160 chars)',
+        bullet3: '✔ 3-5 Strategic Contextual Internal Links to Pillar Pages',
+        bullet4: '✔ WebP Compressed Images with Descriptive Alt Tags & Schema',
+        cta: 'Optimize Your Webpages Today 💬',
+        caption: `✅ Follow this 5-Step On-Page SEO Checklist before publishing any article! 🚀
+
+1️⃣ Clean URL & H1: Include your primary target keyword naturally in your page URL and <h1> tag.
+2️⃣ High-CTR Meta Tags: Write title tags under 60 chars and compelling meta descriptions under 160 chars with numbers.
+3️⃣ Strategic Internal Links: Add 3-5 links connecting your new post to your high-priority service pages.
+4️⃣ Optimized Images: Convert all images to next-gen WebP format and write keyword-rich alt descriptions.
+5️⃣ Structured Schema: Implement JSON-LD FAQ and Article schema for rich Google snippets!
+
+Save this checklist for your next blog! 🔖
+📞 WhatsApp: +91 9316954389
+🌐 thedigitalmarketings.com
+
+#OnPageSEO #SEOChecklist #ContentOptimization #WebpImages #SchemaMarkup #GoogleRanking #TheDigitalMarketings #DigitalMarketingTips`
+      },
+      {
+        id: 9,
+        category: '⚖️ STRATEGIC COMPARISON GUIDE',
+        title: 'Meta Ads vs Google Ads',
+        badge: 'MAXIMIZE YOUR AD BUDGET',
+        headline: 'Meta Ads vs Google Ads: Which is Best for Your Business?',
+        subheadline: 'Understanding Demand Creation (Meta) vs Intent Capture (Google) to maximize your returns.',
+        statBadge: '💡 Winning Formula: Blend Both',
+        bullet1: '📱 META ADS (Push): Best for brand awareness, visuals & B2C',
+        bullet2: '📱 META USER: "I am browsing social media, wow me!"',
+        bullet3: '🎯 GOOGLE ADS (Pull): Best for urgent high-intent buyer searches',
+        bullet4: '🎯 GOOGLE USER: "I need this service right now, who is best?"',
+        cta: 'Build Your Blended Ad Funnel 💬',
+        caption: `⚖️ Meta Ads vs Google Ads: Which one should you invest in? 🤔
+
+📱 META ADS (Facebook & Instagram):
+• Type: Demand Creation (Push Marketing)
+• Best For: E-commerce, fashion, interior design, coaching, local restaurants.
+• Audience Mindset: Relaxing on social media — they buy when inspired by aesthetic creatives.
+
+🎯 GOOGLE ADS:
+• Type: Intent Capture (Pull Marketing)
+• Best For: Emergency services, B2B, real estate, legal, medical, SEO agencies.
+• Audience Mindset: Actively searching to hire immediately.
+
+🔥 The Winning Strategy: Use Google Ads to capture active buyers, and Meta Ads to retarget and build massive brand awareness!
+
+Need a custom ad strategy?
+📞 WhatsApp: +91 9316954389
+🌐 thedigitalmarketings.com
+
+#MetaAdsVsGoogleAds #PPCvsSocialAds #AdStrategy #FacebookAds #GooglePPC #TheDigitalMarketings #MarketingStrategy #ROAS`
+      },
+      {
+        id: 10,
+        category: '🚀 360° REVENUE ACCELERATOR',
+        title: '360° Digital Marketing Blueprint',
+        badge: 'COMPLETE GROWTH ECOSYSTEM',
+        headline: 'Why Relying on Only 1 Marketing Channel Kills Your Growth',
+        subheadline: 'Scale your business with an omnipresent 360° growth engine customized for 2026.',
+        statBadge: '🔥 10x Total Business Revenue',
+        bullet1: '🔍 SEO & Google Ranking: Compounding passive inbound traffic',
+        bullet2: '⚡ Google Ads (PPC): Instant high-buyer intent conversion',
+        bullet3: '📱 Meta Ads & SMM: Omnipresent social proof & viral recall',
+        bullet4: '📍 GMB Local Map Pack: Dominate local phone calls & footfall',
+        cta: 'Claim Free 360° Growth Audit 💬',
+        caption: `🚀 Relying on just 1 marketing channel is like standing on a one-legged table.
+
+When you combine all 4 pillars into a unified 360° growth flywheel, your brand becomes unstoppable:
+
+1️⃣ SEO: Free organic compounding traffic that never stops
+2️⃣ Google Ads: Immediate capture of high-intent searchers
+3️⃣ Meta Ads & SMM: Building viral brand recall and retargeting
+4️⃣ GMB Maps: Dominating local calls and neighborhood footfall
+
+Founder Sabir Ajmeri and the team at The Digital Marketings will build your customized 30-Day Growth Sprint.
+
+🔥 Claim your Free 360° Strategy Audit now:
+📞 Call / WhatsApp: +91 9316954389
+🌐 thedigitalmarketings.com
+
+#360DigitalMarketing #OmnichannelMarketing #BusinessGrowth #TheDigitalMarketings #SabirAjmeri #SEO #MetaAds #GoogleAds #GMB`
+      }
+    ];
+
+    let currentPostIdx = 0;
+    const canvas = document.getElementById('postCanvas');
+    const ctx = canvas.getContext('2d');
+
+    // Preload Logo
+    const brandLogoImg = new Image();
+    brandLogoImg.src = 'assets/logo.svg';
+    brandLogoImg.onload = () => {
+      renderPostCanvas(currentPostIdx);
+    };
+
+    function renderPostsNavList() {
+      const navList = document.getElementById('postsNavList');
+      navList.innerHTML = tdmBrandPosts.map((p, idx) => `
+        <div class="post-nav-item ${idx === currentPostIdx ? 'active' : ''}" onclick="switchPost(${idx})">
+          <div class="post-num-badge">${p.id}</div>
+          <div class="post-item-info">
+            <div class="post-item-category">${p.category}</div>
+            <div class="post-item-title">${p.title}</div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function switchPost(idx) {
+      currentPostIdx = idx;
+      renderPostsNavList();
+      updatePostUI(idx);
+      renderPostCanvas(idx);
+    }
+
+    function updatePostUI(idx) {
+      const post = tdmBrandPosts[idx];
+      document.getElementById('currentPostCategory').textContent = post.category;
+      document.getElementById('currentPostHeading').textContent = post.headline;
+      document.getElementById('postCounterLabel').textContent = `Post ${idx + 1} of 10`;
+      document.getElementById('captionTextarea').value = post.caption;
+    }
+
+    /* --------------------------------------------------------------------------
+       Canvas High-Definition 1080 × 1350 Renderer
+       -------------------------------------------------------------------------- */
+    function renderPostCanvas(idx) {
+      const data = tdmBrandPosts[idx];
+      const w = 1080;
+      const h = 1350;
+
+      // 1. Dark Cyber Gradient Background
+      const bgGrad = ctx.createLinearGradient(0, 0, 0, h);
+      bgGrad.addColorStop(0, '#0C1019');
+      bgGrad.addColorStop(0.5, '#07090F');
+      bgGrad.addColorStop(1, '#05070A');
+      ctx.fillStyle = bgGrad;
+      ctx.fillRect(0, 0, w, h);
+
+      // 2. Ambient Neon Lime Glow Orbs
+      // Top Right Glow
+      const glow1 = ctx.createRadialGradient(w - 120, 180, 20, w - 120, 180, 480);
+      glow1.addColorStop(0, 'rgba(210, 250, 21, 0.22)');
+      glow1.addColorStop(0.5, 'rgba(210, 250, 21, 0.08)');
+      glow1.addColorStop(1, 'transparent');
+      ctx.fillStyle = glow1;
+      ctx.beginPath();
+      ctx.arc(w - 120, 180, 480, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Bottom Left Glow
+      const glow2 = ctx.createRadialGradient(140, h - 260, 20, 140, h - 260, 460);
+      glow2.addColorStop(0, 'rgba(210, 250, 21, 0.18)');
+      glow2.addColorStop(0.5, 'rgba(210, 250, 21, 0.06)');
+      glow2.addColorStop(1, 'transparent');
+      ctx.fillStyle = glow2;
+      ctx.beginPath();
+      ctx.arc(140, h - 260, 460, 0, Math.PI * 2);
+      ctx.fill();
+
+      // 3. Subtle Cyber Matrix Grid
+      ctx.save();
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.04)';
+      ctx.lineWidth = 1;
+      const gridGap = 60;
+      for (let x = 0; x < w; x += gridGap) {
+        ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, h); ctx.stroke();
+      }
+      for (let y = 0; y < h; y += gridGap) {
+        ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(w, y); ctx.stroke();
+      }
+      ctx.restore();
+
+      const padX = 70;
+      let curY = 70;
+
+      // 4. Header: Official DM Brand Logo (Crisp aspect-ratio preserved)
+      if (brandLogoImg.complete && brandLogoImg.naturalWidth > 0) {
+        const maxW = 240;
+        const maxH = 100;
+        const imgAspect = brandLogoImg.width / brandLogoImg.height;
+        let drawW = maxW;
+        let drawH = drawW / imgAspect;
+        if (drawH > maxH) {
+          drawH = maxH;
+          drawW = drawH * imgAspect;
+        }
+        ctx.drawImage(brandLogoImg, padX, curY - 10, drawW, drawH);
+      } else {
+        ctx.fillStyle = '#D2FA15';
+        ctx.font = '900 32px "Outfit", sans-serif';
+        ctx.fillText('THE DIGITAL MARKETINGS', padX, curY + 40);
+      }
+
+      // Top Right Category Pill
+      ctx.save();
+      const catW = 340;
+      const catH = 46;
+      const catX = w - padX - catW;
+      const catY = curY + 12;
+
+      ctx.fillStyle = 'rgba(210, 250, 21, 0.12)';
+      ctx.strokeStyle = '#D2FA15';
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.roundRect(catX, catY, catW, catH, 23);
+      ctx.fill();
+      ctx.stroke();
+
+      ctx.fillStyle = '#D2FA15';
+      ctx.font = '800 15px "Outfit", sans-serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(`●  ${data.badge}`, catX + (catW / 2), catY + (catH / 2));
+      ctx.restore();
+
+      curY += 130;
+
+      // 5. Stat Badge (Urgency / Proof)
+      ctx.save();
+      ctx.font = '800 18px "Outfit", sans-serif';
+      ctx.fillStyle = '#D2FA15';
+      ctx.textAlign = 'left';
+      ctx.fillText(data.statBadge.toUpperCase(), padX, curY);
+      ctx.restore();
+
+      curY += 46;
+
+      // 6. Main Bold Headline
+      ctx.save();
+      ctx.font = '900 52px "Outfit", sans-serif';
+      ctx.fillStyle = '#FFFFFF';
+      ctx.textAlign = 'left';
+      const headlineLines = wrapText(ctx, data.headline, w - (padX * 2));
+      headlineLines.forEach((line, i) => {
+        ctx.fillStyle = i === 0 ? '#D2FA15' : '#FFFFFF';
+        ctx.fillText(line, padX, curY);
+        curY += 62;
+      });
+      ctx.restore();
+
+      curY += 10;
+
+      // 7. Sub-headline
+      ctx.save();
+      ctx.font = '500 22px "Plus Jakarta Sans", sans-serif';
+      ctx.fillStyle = '#94A3B8';
+      const subLines = wrapText(ctx, data.subheadline, w - (padX * 2));
+      subLines.forEach(line => {
+        ctx.fillText(line, padX, curY);
+        curY += 32;
+      });
+      ctx.restore();
+
+      curY += 24;
+
+      // 8. 4 Infographic Feature Cards
+      const bullets = [data.bullet1, data.bullet2, data.bullet3, data.bullet4];
+      const cardH = 92;
+      bullets.forEach((bullet, idx) => {
+        drawFeatureCard(ctx, padX, curY, w - (padX * 2), cardH, bullet, idx + 1);
+        curY += cardH + 16;
+      });
+
+      curY += 14;
+
+      // 9. CTA High-Converting Neon Button
+      drawCtaButton(ctx, padX, curY, w - (padX * 2), 76, data.cta);
+
+      // 10. Bottom Verified Footer Contact Bar
+      const footY = h - 90;
+      ctx.save();
+      ctx.fillStyle = 'rgba(12, 16, 24, 0.95)';
+      ctx.strokeStyle = 'rgba(210, 250, 21, 0.3)';
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.roundRect(padX, footY, w - (padX * 2), 54, 16);
+      ctx.fill();
+      ctx.stroke();
+
+      ctx.fillStyle = '#D2FA15';
+      ctx.font = '800 16px "Outfit", sans-serif';
+      ctx.textAlign = 'left';
+      ctx.textBaseline = 'middle';
+      ctx.fillText('📞 +91 9316954389', padX + 24, footY + 27);
+
+      ctx.fillStyle = '#CBD5E1';
+      ctx.font = '600 15px "Plus Jakarta Sans", sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText('📍 Ahmedabad, Gujarat, India', w / 2, footY + 27);
+
+      ctx.fillStyle = '#D2FA15';
+      ctx.font = '700 15px "Plus Jakarta Sans", sans-serif';
+      ctx.textAlign = 'right';
+      ctx.fillText('🌐 thedigitalmarketings.com', w - padX - 24, footY + 27);
+      ctx.restore();
+    }
+
+    function drawFeatureCard(ctx, x, y, w, h, text, index) {
+      ctx.save();
+      // Glass Dark Card Background
+      ctx.fillStyle = 'rgba(18, 23, 34, 0.88)';
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.08)';
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.roundRect(x, y, w, h, 16);
+      ctx.fill();
+      ctx.stroke();
+
+      // Neon Accent Left Bar
+      ctx.fillStyle = '#D2FA15';
+      ctx.beginPath();
+      ctx.roundRect(x, y, 8, h, [16, 0, 0, 16]);
+      ctx.fill();
+
+      // Number Badge Circle
+      ctx.fillStyle = 'rgba(210, 250, 21, 0.12)';
+      ctx.beginPath();
+      ctx.arc(x + 46, y + (h / 2), 22, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.fillStyle = '#D2FA15';
+      ctx.font = '800 18px "Outfit", sans-serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(`0${index}`, x + 46, y + (h / 2));
+
+      // Bullet Text
+      ctx.textAlign = 'left';
+      ctx.textBaseline = 'middle';
+      ctx.font = '700 21px "Plus Jakarta Sans", sans-serif';
+      ctx.fillStyle = '#F8FAFC';
+      ctx.fillText(text, x + 88, y + (h / 2));
+
+      ctx.restore();
+    }
+
+    function drawCtaButton(ctx, x, y, w, h, text) {
+      ctx.save();
+      ctx.fillStyle = '#D2FA15';
+      ctx.shadowColor = 'rgba(210, 250, 21, 0.6)';
+      ctx.shadowBlur = 24;
+      ctx.beginPath();
+      ctx.roundRect(x, y, w, h, 20);
+      ctx.fill();
+
+      ctx.fillStyle = '#000000';
+      ctx.font = '900 24px "Outfit", sans-serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(text.toUpperCase() + ' →', x + (w / 2), y + (h / 2));
+      ctx.restore();
+    }
+
+    function wrapText(ctx, text, maxWidth) {
+      if (!text) return [];
+      const words = text.split(' ');
+      const lines = [];
+      let currentLine = words[0];
+
+      for (let i = 1; i < words.length; i++) {
+        const word = words[i];
+        const width = ctx.measureText(currentLine + ' ' + word).width;
+        if (width < maxWidth) {
+          currentLine += ' ' + word;
+        } else {
+          lines.push(currentLine);
+          currentLine = word;
+        }
+      }
+      lines.push(currentLine);
+      return lines;
+    }
+
+    // Navigation & Button Event Listeners
+    document.getElementById('prevPostBtn').addEventListener('click', () => {
+      const newIdx = (currentPostIdx - 1 + tdmBrandPosts.length) % tdmBrandPosts.length;
+      switchPost(newIdx);
+    });
+
+    document.getElementById('nextPostBtn').addEventListener('click', () => {
+      const newIdx = (currentPostIdx + 1) % tdmBrandPosts.length;
+      switchPost(newIdx);
+    });
+
+    document.getElementById('downloadCurrentPostBtn').addEventListener('click', () => {
+      const post = tdmBrandPosts[currentPostIdx];
+      const filename = `TDM-InstaPost-${post.id}-${post.title.toLowerCase().replace(/[^a-z0-9]+/g, '-')}.png`;
+      const link = document.createElement('a');
+      link.download = filename;
+      link.href = canvas.toDataURL('image/png', 1.0);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    });
+
+    document.getElementById('copyCaptionBtn').addEventListener('click', () => {
+      const textarea = document.getElementById('captionTextarea');
+      textarea.select();
+      navigator.clipboard.writeText(textarea.value);
+      const btn = document.getElementById('copyCaptionBtn');
+      btn.textContent = '✓ Copied to Clipboard!';
+      setTimeout(() => btn.textContent = '📋 Copy Caption', 2000);
+    });
+
+    // Batch Download All 10 Posts
+    document.getElementById('downloadBatchAllBtn').addEventListener('click', async () => {
+      const btn = document.getElementById('downloadBatchAllBtn');
+      btn.textContent = '⏳ Generating 10 Posts...';
+
+      for (let i = 0; i < tdmBrandPosts.length; i++) {
+        renderPostCanvas(i);
+        await new Promise(r => setTimeout(r, 200));
+
+        const post = tdmBrandPosts[i];
+        const filename = `TDM-Post-0${post.id}-${post.title.toLowerCase().replace(/[^a-z0-9]+/g, '-')}.png`;
+        const link = document.createElement('a');
+        link.download = filename;
+        link.href = canvas.toDataURL('image/png', 1.0);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      }
+
+      renderPostCanvas(currentPostIdx);
+      btn.textContent = '✓ All 10 Posts Downloaded!';
+      setTimeout(() => btn.textContent = '📦 Download All 10 Posts', 3000);
+    });
+
+    // Initial load
+    renderPostsNavList();
+    updatePostUI(0);
+  </script>
+</body>
+</html>
