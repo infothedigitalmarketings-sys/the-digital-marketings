@@ -789,240 +789,6 @@ body {
 .char-count.good { color: var(--admin-success); }
 .char-count.warn { color: var(--admin-warning); }
 
-/* --------------------------------------------------------------------------
-   TAB 4: INVOICE GENERATOR & PRINT TEMPLATE
-   -------------------------------------------------------------------------- */
-.invoice-toolbar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 20px;
-  gap: 16px;
-  flex-wrap: wrap;
-}
-.invoice-paper {
-  background-color: #FFFFFF;
-  color: #1A202C;
-  border-radius: var(--radius-md);
-  padding: 40px;
-  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.6);
-  max-width: 900px;
-  margin: 0 auto;
-  font-family: 'Plus Jakarta Sans', sans-serif;
-}
-.inv-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  border-bottom: 2px solid #EDF2F7;
-  padding-bottom: 24px;
-  margin-bottom: 24px;
-}
-.inv-brand-col {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-.inv-logo-img {
-  height: 52px;
-  width: auto;
-  max-width: 200px;
-  object-fit: contain;
-  margin-bottom: 6px;
-  background: #090B10;
-  padding: 8px 16px;
-  border-radius: 8px;
-  border: 1px solid #1E293B;
-  display: inline-block;
-  align-self: flex-start;
-}
-.inv-company-name {
-  font-family: 'Outfit', sans-serif;
-  font-size: 1.4rem;
-  font-weight: 800;
-  color: #0F172A;
-}
-.inv-address-line {
-  font-size: 0.82rem;
-  color: #64748B;
-  line-height: 1.4;
-}
-.inv-meta-col {
-  text-align: right;
-}
-.inv-badge-title {
-  font-family: 'Outfit', sans-serif;
-  font-size: 1.8rem;
-  font-weight: 900;
-  color: #0F172A;
-  letter-spacing: 0.05em;
-}
-.inv-meta-item {
-  font-size: 0.85rem;
-  color: #475569;
-  margin-top: 4px;
-}
-.inv-meta-item strong {
-  color: #0F172A;
-}
-
-.inv-bill-row {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 24px;
-  margin-bottom: 30px;
-  padding: 16px;
-  background-color: #F8FAFC;
-  border-radius: 8px;
-  border: 1px solid #E2E8F0;
-}
-.inv-bill-col h4 {
-  font-size: 0.78rem;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  color: #64748B;
-  margin-bottom: 8px;
-}
-.inv-bill-name {
-  font-size: 1.05rem;
-  font-weight: 700;
-  color: #0F172A;
-}
-.inv-bill-text {
-  font-size: 0.85rem;
-  color: #475569;
-}
-
-/* Invoice Line Items Table */
-.inv-table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-bottom: 24px;
-}
-.inv-table th {
-  background-color: #0F172A;
-  color: #FFFFFF;
-  padding: 10px 14px;
-  font-size: 0.8rem;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  text-align: left;
-}
-.inv-table th:last-child {
-  text-align: right;
-}
-.inv-table td {
-  padding: 12px 14px;
-  border-bottom: 1px solid #E2E8F0;
-  font-size: 0.88rem;
-  color: #334155;
-}
-.inv-table td:last-child {
-  text-align: right;
-  font-weight: 700;
-  color: #0F172A;
-}
-.inv-table-input {
-  border: 1px solid #CBD5E1;
-  border-radius: 4px;
-  padding: 6px 8px;
-  width: 100%;
-  font-size: 0.85rem;
-  font-family: inherit;
-}
-.inv-table-input:focus {
-  outline: none;
-  border-color: #0F172A;
-}
-.inv-btn-remove-row {
-  background: none;
-  border: none;
-  color: #EF4444;
-  cursor: pointer;
-  font-size: 1.1rem;
-  padding: 4px;
-}
-
-/* Invoice Summary */
-.inv-summary-grid {
-  display: grid;
-  grid-template-columns: 1.2fr 1fr;
-  gap: 24px;
-  margin-top: 20px;
-}
-.inv-bank-box {
-  background: #F8FAFC;
-  border: 1px solid #E2E8F0;
-  border-radius: 8px;
-  padding: 16px;
-  font-size: 0.82rem;
-  color: #475569;
-}
-.inv-bank-box h5 {
-  color: #0F172A;
-  font-size: 0.85rem;
-  margin-bottom: 8px;
-}
-.inv-calc-box {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-.inv-calc-row {
-  display: flex;
-  justify-content: space-between;
-  font-size: 0.88rem;
-  color: #475569;
-}
-.inv-calc-row.grand-total {
-  border-top: 2px solid #0F172A;
-  padding-top: 10px;
-  margin-top: 6px;
-  font-size: 1.2rem;
-  font-weight: 800;
-  color: #0F172A;
-}
-.inv-in-words {
-  font-size: 0.78rem;
-  color: #64748B;
-  font-style: italic;
-  text-align: right;
-  margin-top: 4px;
-}
-
-/* Print Stylesheet */
-@media print {
-  body {
-    background: #FFF !important;
-    color: #000 !important;
-    padding: 0 !important;
-  }
-  .admin-sidebar, .admin-topbar, .admin-glow-orb, .invoice-toolbar, .no-print {
-    display: none !important;
-  }
-  .admin-layout, .admin-main, .admin-content-view {
-    display: block !important;
-    padding: 0 !important;
-    margin: 0 !important;
-    max-height: none !important;
-    overflow: visible !important;
-  }
-  .invoice-paper {
-    box-shadow: none !important;
-    border: none !important;
-    padding: 0 !important;
-    max-width: 100% !important;
-    width: 100% !important;
-  }
-  .inv-table-input {
-    border: none !important;
-    padding: 0 !important;
-    background: transparent !important;
-  }
-  .inv-btn-remove-row, .inv-add-row-btn {
-    display: none !important;
-  }
-}
 
 /* --------------------------------------------------------------------------
    TAB 5: SMART INSTAGRAM POST STUDIO (1080x1350)
@@ -1968,54 +1734,62 @@ body {
 }
 
 .inv-header {
-  display: flex;
+  display: grid;
+  grid-template-columns: 1fr auto;
   justify-content: space-between;
   align-items: flex-start;
   gap: 24px;
-  padding-bottom: 24px;
+  padding-bottom: 20px;
   border-bottom: 2px solid #E2E8F0;
   margin-bottom: 24px;
 }
 
 .inv-brand-col {
-  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
 }
 
 .inv-logo-img {
   background: #07090E;
-  padding: 8px 16px;
-  border-radius: 10px;
-  height: 52px;
+  padding: 6px 14px;
+  border-radius: 8px;
+  height: 48px;
   width: auto;
   object-fit: contain;
   display: inline-block;
   border: 1px solid rgba(210, 250, 21, 0.3);
-  margin-bottom: 10px;
+  margin-bottom: 6px;
+  align-self: flex-start;
 }
 
 .inv-company-name {
   font-family: 'Outfit', sans-serif;
-  font-size: 1.3rem;
+  font-size: 1.35rem;
   font-weight: 800;
   color: #090B10;
   letter-spacing: -0.02em;
 }
 
 .inv-address-line {
-  font-size: 0.8rem;
+  font-size: 0.82rem;
   color: #475569;
   line-height: 1.5;
-  margin-top: 4px;
+  margin-top: 2px;
 }
 
 .inv-meta-col {
   text-align: right;
-  min-width: 220px;
+  min-width: 240px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
 }
 
 .inv-badge-title {
   font-family: 'Outfit', sans-serif;
-  font-size: 1.5rem;
+  font-size: 1.6rem;
   font-weight: 900;
   color: #090B10;
   letter-spacing: 0.06em;
@@ -2023,12 +1797,15 @@ body {
   padding-bottom: 4px;
   border-bottom: 2px solid #090B10;
   display: inline-block;
+  text-align: right;
 }
 
 .inv-meta-item {
-  font-size: 0.82rem;
+  font-size: 0.84rem;
   color: #334155;
   margin-bottom: 4px;
+  text-align: right;
+  white-space: nowrap;
 }
 
 .inv-meta-item strong {
@@ -2126,11 +1903,34 @@ body {
   font-family: inherit;
   outline: none;
   transition: border-color 0.2s;
+  box-sizing: border-box;
 }
 
 .inv-table-input:focus {
   border-color: #090B10;
   box-shadow: 0 0 0 2px rgba(9, 11, 16, 0.1);
+}
+
+.inv-table-input.inv-item-desc {
+  min-height: 32px;
+  line-height: 1.45;
+  white-space: pre-wrap;
+  word-break: break-word;
+  cursor: text;
+  text-align: left;
+}
+
+.inv-table-input.inv-item-desc:focus {
+  background: #FFFBEB;
+  border-color: #D97706;
+}
+
+.inv-item-qty, .inv-item-tax {
+  text-align: center;
+}
+
+.inv-item-rate {
+  text-align: right;
 }
 
 .inv-item-total {
@@ -2226,45 +2026,372 @@ body {
   font-size: 1.25rem;
 }
 
-/* Print Styles */
+/* ==========================================================================
+   PRINT STYLESHEET (PROFESSIONAL A4 SINGLE/MULTI-PAGE INVOICE)
+   ========================================================================== */
 @media print {
   @page {
-    margin: 8mm;
     size: A4 portrait;
+    margin: 8mm 10mm 8mm 10mm;
+  }
+  
+  *, *::before, *::after {
+    text-shadow: none !important;
   }
   
   html, body {
     background: #FFFFFF !important;
-    color: #000000 !important;
-    min-height: auto !important;
+    background-color: #FFFFFF !important;
+    color: #0F172A !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    width: 100% !important;
+    height: auto !important;
+    min-height: 0 !important;
+    overflow: visible !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+    font-size: 12px;
   }
   
+  /* 1. HIDE ALL NON-INVOICE UI ELEMENTS */
   .admin-sidebar,
-  .top-bar,
   .admin-topbar,
+  .top-bar,
+  .admin-glow-orb,
+  .admin-glow-orb-1,
+  .admin-glow-orb-2,
+  .lock-overlay,
+  .pin-lock-overlay,
   .invoice-toolbar,
   .no-print,
-  .pin-lock-overlay {
+  .inv-btn-remove-row,
+  .inv-add-row-btn,
+  #view-analytics,
+  #view-leads,
+  #view-blog,
+  #blogExportModal,
+  .admin-modal-overlay,
+  .sidebar-footer,
+  .mobile-menu-toggle {
+    display: none !important;
+    visibility: hidden !important;
+    height: 0 !important;
+    width: 0 !important;
+    overflow: hidden !important;
+  }
+  
+  /* Hide all views by default */
+  .admin-content-view {
     display: none !important;
   }
   
-  .admin-layout,
-  .admin-main,
-  .admin-content-view,
-  .invoice-paper {
+  /* ONLY show invoice view */
+  .admin-content-view#view-invoice {
+    display: block !important;
     padding: 0 !important;
     margin: 0 !important;
-    max-width: 100% !important;
     border: none !important;
+    width: 100% !important;
+  }
+  
+  .admin-layout,
+  .admin-main {
+    display: block !important;
+    position: static !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    width: 100% !important;
+    max-height: none !important;
+    height: auto !important;
+    overflow: visible !important;
+    background: transparent !important;
+    border: none !important;
+  }
+  
+  /* 2. INVOICE PAPER CANVAS */
+  .invoice-paper {
+    display: block !important;
+    position: static !important;
     box-shadow: none !important;
+    border: none !important;
+    border-radius: 0 !important;
+    padding: 4px 6px !important;
+    margin: 0 auto !important;
+    width: 100% !important;
+    max-width: 100% !important;
     background: #FFFFFF !important;
+    color: #0F172A !important;
+  }
+  
+  /* Page break rules */
+  .inv-header,
+  .inv-bill-row,
+  .inv-table,
+  .inv-item-row,
+  .inv-summary-grid,
+  .inv-footer-note {
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+  }
+  
+  /* Header in Print: strictly 2 columns side-by-side */
+  .inv-header {
+    display: grid !important;
+    grid-template-columns: 1fr auto !important;
+    justify-content: space-between !important;
+    align-items: flex-start !important;
+    border-bottom: 2px solid #090B10 !important;
+    padding-bottom: 14px !important;
+    margin-bottom: 16px !important;
+    gap: 20px !important;
+    width: 100% !important;
+  }
+  
+  .inv-brand-col {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 3px !important;
+  }
+  
+  .inv-logo-img {
+    background: #090B10 !important;
+    padding: 6px 14px !important;
+    border-radius: 8px !important;
+    height: 44px !important;
+    border: 1px solid #1E293B !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+    margin-bottom: 6px !important;
+    align-self: flex-start !important;
+  }
+  
+  .inv-company-name {
+    font-size: 1.25rem !important;
+    color: #090B10 !important;
+    font-weight: 800 !important;
+  }
+  
+  .inv-address-line {
+    font-size: 0.76rem !important;
+    color: #475569 !important;
+    line-height: 1.4 !important;
+  }
+  
+  .inv-meta-col {
+    text-align: right !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: flex-end !important;
+    min-width: 210px !important;
+  }
+  
+  .inv-badge-title {
+    font-size: 1.4rem !important;
+    font-weight: 900 !important;
+    color: #090B10 !important;
+    letter-spacing: 0.05em !important;
+    border-bottom: 2px solid #090B10 !important;
+    padding-bottom: 3px !important;
+    margin-bottom: 8px !important;
+    text-align: right !important;
+  }
+  
+  .inv-meta-item {
+    font-size: 0.78rem !important;
+    color: #334155 !important;
+    margin-bottom: 3px !important;
+    text-align: right !important;
+    white-space: nowrap !important;
+  }
+  
+  .inv-meta-item strong {
+    color: #090B10 !important;
+  }
+  
+  /* Billed to row */
+  .inv-bill-row {
+    display: grid !important;
+    grid-template-columns: 1.2fr 1fr !important;
+    gap: 14px !important;
+    margin-bottom: 16px !important;
+    background: #F8FAFC !important;
+    border: 1px solid #E2E8F0 !important;
+    border-radius: 8px !important;
+    padding: 12px 14px !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+  
+  .inv-bill-col {
+    background: transparent !important;
+    border: none !important;
+    padding: 0 !important;
+  }
+  
+  .inv-bill-col h4 {
+    font-size: 0.7rem !important;
+    font-weight: 800 !important;
+    color: #64748B !important;
+    text-transform: uppercase !important;
+    margin-bottom: 4px !important;
+  }
+  
+  .inv-bill-name {
+    font-size: 0.92rem !important;
+    font-weight: 700 !important;
+    color: #0F172A !important;
+    margin-bottom: 2px !important;
+  }
+  
+  .inv-bill-text {
+    font-size: 0.76rem !important;
+    color: #475569 !important;
+    line-height: 1.4 !important;
+    margin-bottom: 2px !important;
+  }
+  
+  /* Table styling */
+  .inv-table {
+    width: 100% !important;
+    border-collapse: collapse !important;
+    margin: 12px 0 14px 0 !important;
+  }
+  
+  .inv-table thead tr,
+  .inv-table th {
+    background: #090B10 !important;
+    color: #FFFFFF !important;
+    font-size: 0.72rem !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.04em !important;
+    padding: 8px 10px !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+  
+  .inv-table td {
+    padding: 8px 10px !important;
+    border-bottom: 1px solid #E2E8F0 !important;
+    font-size: 0.8rem !important;
+    color: #0F172A !important;
+    vertical-align: middle !important;
   }
   
   .inv-table-input {
     border: none !important;
-    padding: 0 !important;
     background: transparent !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    font-size: inherit !important;
+    font-family: inherit !important;
+    color: #0F172A !important;
+    box-shadow: none !important;
+    outline: none !important;
+    width: 100% !important;
+    -webkit-appearance: none !important;
+    appearance: none !important;
+    -moz-appearance: textfield !important;
+  }
+  
+  .inv-table-input.inv-item-desc {
+    white-space: pre-wrap !important;
+    word-break: break-word !important;
+    line-height: 1.4 !important;
+    min-height: auto !important;
+    text-align: left !important;
+  }
+  
+  .inv-table-input::-webkit-outer-spin-button,
+  .inv-table-input::-webkit-inner-spin-button {
+    -webkit-appearance: none !important;
+    margin: 0 !important;
+  }
+  
+  .inv-item-total {
+    font-weight: 700 !important;
+    color: #090B10 !important;
+    text-align: right !important;
+  }
+  
+  /* Summary & Bank Grid */
+  .inv-summary-grid {
+    display: grid !important;
+    grid-template-columns: 1.2fr 1fr !important;
+    gap: 14px !important;
+    margin-top: 14px !important;
+    align-items: start !important;
+  }
+  
+  .inv-bank-box,
+  .inv-calc-box {
+    background: #F8FAFC !important;
+    border: 1px solid #E2E8F0 !important;
+    border-radius: 8px !important;
+    padding: 12px 14px !important;
+    font-size: 0.76rem !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+  
+  .inv-bank-box h5 {
+    font-size: 0.74rem !important;
+    font-weight: 800 !important;
+    color: #0F172A !important;
+    text-transform: uppercase !important;
+    margin-bottom: 6px !important;
+  }
+  
+  .inv-calc-row {
+    display: flex !important;
+    justify-content: space-between !important;
+    font-size: 0.78rem !important;
+    color: #475569 !important;
+    padding: 4px 0 !important;
+    border-bottom: 1px dashed #E2E8F0 !important;
+  }
+  
+  .inv-calc-row span:last-child {
+    font-weight: 600 !important;
+    color: #0F172A !important;
+  }
+  
+  .inv-calc-row.grand-total {
+    font-size: 1.05rem !important;
+    font-weight: 900 !important;
+    color: #090B10 !important;
+    border-top: 2px solid #090B10 !important;
+    border-bottom: none !important;
+    padding-top: 6px !important;
+    margin-top: 6px !important;
+  }
+  
+  .inv-calc-row.grand-total span:last-child {
+    color: #090B10 !important;
+    font-size: 1.15rem !important;
+  }
+  
+  .inv-in-words {
+    font-size: 0.72rem !important;
+    color: #64748B !important;
+    font-style: italic !important;
+    text-align: right !important;
+    margin-top: 4px !important;
+  }
+  
+  /* Footer Note & Signature */
+  .inv-footer-note {
+    margin-top: 24px !important;
+    padding-top: 14px !important;
+    border-top: 1px solid #E2E8F0 !important;
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: flex-end !important;
+    font-size: 0.74rem !important;
+    color: #64748B !important;
   }
 }
+
 
 

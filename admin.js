@@ -888,33 +888,42 @@ function initInvoiceGenerator() {
   }
 
   function createItemRow(desc = 'Fast Google Keyword Ranking & SEO Sprint (Month 1)', qty = 1, rate = 25000, tax = 18) {
+    const currency = currencySelect ? currencySelect.value : '₹';
     const tr = document.createElement('tr');
     tr.className = 'inv-item-row';
     tr.innerHTML = `
       <td>
-        <input type="text" class="inv-table-input inv-item-desc" value="${desc}">
+        <div class="inv-table-input inv-item-desc" contenteditable="true" role="textbox" spellcheck="false">${desc}</div>
       </td>
-      <td style="width: 80px;">
+      <td style="width: 70px; text-align: center;">
         <input type="number" class="inv-table-input inv-item-qty" value="${qty}" min="1" step="1">
       </td>
-      <td style="width: 140px;">
+      <td style="width: 120px; text-align: right;">
         <input type="number" class="inv-table-input inv-item-rate" value="${rate}" min="0" step="100">
       </td>
-      <td style="width: 90px;">
+      <td style="width: 80px; text-align: center;">
         <input type="number" class="inv-table-input inv-item-tax" value="${tax}" min="0" step="1">
       </td>
-      <td class="inv-item-total" style="width: 140px;">
-        ₹ ${rate.toLocaleString()}
+      <td class="inv-item-total" style="width: 130px; text-align: right;">
+        ${currency} ${(qty * rate).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
       </td>
-      <td style="width: 40px; text-align: center;" class="no-print">
+      <td style="width: 36px; text-align: center;" class="no-print">
         <button type="button" class="inv-btn-remove-row" title="Remove Item">✕</button>
       </td>
     `;
 
-    // Listen to inputs
+    // Listen to inputs & sync attributes
     tr.querySelectorAll('input').forEach(inp => {
-      inp.addEventListener('input', calculateTotals);
+      inp.addEventListener('input', () => {
+        inp.setAttribute('value', inp.value);
+        calculateTotals();
+      });
     });
+
+    const descDiv = tr.querySelector('.inv-item-desc');
+    if (descDiv) {
+      descDiv.addEventListener('input', calculateTotals);
+    }
 
     // Remove row
     tr.querySelector('.inv-btn-remove-row').addEventListener('click', () => {
@@ -943,12 +952,22 @@ function initInvoiceGenerator() {
     });
   }
 
-  if (currencySelect) currencySelect.addEventListener('change', calculateTotals);
+  if (currencySelect) {
+    currencySelect.addEventListener('change', () => {
+      calculateTotals();
+    });
+  }
   if (discountInput) discountInput.addEventListener('input', calculateTotals);
 
   if (printBtn) {
     printBtn.addEventListener('click', () => {
-      window.print();
+      const invTabBtn = document.querySelector('.nav-item-btn[data-tab="invoice"]');
+      if (invTabBtn && !invTabBtn.classList.contains('active')) {
+        invTabBtn.click();
+      }
+      setTimeout(() => {
+        window.print();
+      }, 50);
     });
   }
 }
