@@ -2650,18 +2650,30 @@ img, svg {
 .icon-circle {
   width: 44px;
   height: 44px;
+  min-width: 44px;
+  max-width: 44px;
+  aspect-ratio: 1 / 1;
   border-radius: 50%;
   background: var(--color-primary-dim);
   display: flex;
   align-items: center;
   justify-content: center;
   color: var(--color-primary);
+  flex: 0 0 44px;
   flex-shrink: 0;
+  box-sizing: border-box;
 }
 
-.icon-circle .icon {
+.icon-circle .icon,
+.icon-circle svg {
   width: 20px;
   height: 20px;
+  min-width: 20px;
+  min-height: 20px;
+  max-width: 20px;
+  max-height: 20px;
+  flex-shrink: 0;
+  display: block;
 }
 
 .contact-card-item .label {
@@ -4009,16 +4021,31 @@ img, svg {
   }
 
   .contact-card-item .icon-circle {
-    flex-shrink: 0;
-    margin: 0;
-    width: 40px;
-    height: 40px;
+    flex: 0 0 42px !important;
+    flex-shrink: 0 !important;
+    flex-grow: 0 !important;
+    width: 42px !important;
+    height: 42px !important;
+    min-width: 42px !important;
+    max-width: 42px !important;
+    aspect-ratio: 1 / 1 !important;
+    border-radius: 50% !important;
+    margin: 0 !important;
   }
 
-  .contact-card-item div {
+  .contact-card-item .icon-circle .icon,
+  .contact-card-item .icon-circle svg {
+    width: 20px !important;
+    height: 20px !important;
+    min-width: 20px !important;
+    min-height: 20px !important;
+    flex-shrink: 0 !important;
+  }
+
+  .contact-card-item > div:not(.icon-circle) {
     text-align: left;
     min-width: 0;
-    flex: 1;
+    flex: 1 1 auto;
   }
 
   .contact-card-item .label {
@@ -5592,6 +5619,39 @@ img, svg {
     align-items: center !important;
     text-align: left !important;
     padding: 12px 14px !important;
+    gap: 12px !important;
+  }
+
+  .contact-card-item .icon-circle {
+    flex: 0 0 42px !important;
+    flex-shrink: 0 !important;
+    flex-grow: 0 !important;
+    width: 42px !important;
+    height: 42px !important;
+    min-width: 42px !important;
+    max-width: 42px !important;
+    aspect-ratio: 1 / 1 !important;
+    border-radius: 50% !important;
+    margin: 0 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    background: var(--color-primary-dim) !important;
+  }
+
+  .contact-card-item .icon-circle .icon,
+  .contact-card-item .icon-circle svg {
+    width: 20px !important;
+    height: 20px !important;
+    min-width: 20px !important;
+    min-height: 20px !important;
+    flex-shrink: 0 !important;
+  }
+
+  .contact-card-item > div:not(.icon-circle) {
+    text-align: left !important;
+    min-width: 0 !important;
+    flex: 1 1 auto !important;
   }
 
   .btn-whatsapp {
