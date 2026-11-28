@@ -1037,6 +1037,18 @@ async function initLiveSiteSync() {
 }
 
 async function syncLivePricingConfig() {
+  let localConfig = null;
+  try {
+    const raw = localStorage.getItem('tdm_site_config_v1');
+    if (raw) localConfig = JSON.parse(raw);
+  } catch (e) {}
+
+  // Apply localStorage immediately (synchronously) so refresh never flashes old rates
+  if (localConfig && Array.isArray(localConfig.services)) {
+    TDM_LIVE_CONFIG = localConfig;
+    applyLivePricingConfig(localConfig);
+  }
+
   let repoConfig = null;
   try {
     const res = await fetch(`data/site-config.json?t=${Date.now()}`, { cache: 'no-store' });
@@ -1044,12 +1056,6 @@ async function syncLivePricingConfig() {
   } catch (e) {
     // Graceful fallback if opened via file:// or offline
   }
-
-  let localConfig = null;
-  try {
-    const raw = localStorage.getItem('tdm_site_config_v1');
-    if (raw) localConfig = JSON.parse(raw);
-  } catch (e) {}
 
   let activeConfig = repoConfig || localConfig;
   if (repoConfig && localConfig) {

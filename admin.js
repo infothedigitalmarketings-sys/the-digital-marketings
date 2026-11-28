@@ -986,9 +986,14 @@ function initPricingManager() {
     if (seoSprintEl) seoSprintEl.value = cfg.seoSprintPrice ?? 14999;
     if (webhookEl) webhookEl.value = cfg.leadWebhookUrl || '';
     if (lastUpdatedEl) {
-      lastUpdatedEl.textContent = cfg.updatedAt
+      const ghCfg = getGhSettings();
+      const ghNote = ghCfg.token
+        ? '✅ GitHub Sync Connected — "Save & Publish Live" dabane par live website par sabhi visitors ko dikhega.'
+        : '⚠️ Sirf is browser me save hoga (Live sabhi users ke liye "Storage & GitHub Sync" tab me GitHub Token add karein).';
+      const timeNote = cfg.updatedAt
         ? `Last updated: ${new Date(cfg.updatedAt).toLocaleString('en-IN')}`
         : 'Default configuration loaded';
+      lastUpdatedEl.innerHTML = `${escapeHtml(timeNote)} • <span>${ghNote}</span>`;
     }
 
     const cur = cfg.currency || '₹';
@@ -1053,7 +1058,16 @@ function initPricingManager() {
       </div>
     `).join('');
 
-    // Live preview updates as user types
+    let autoSaveTimer = null;
+    function scheduleAutoSaveLocal() {
+      clearTimeout(autoSaveTimer);
+      autoSaveTimer = setTimeout(() => {
+        const cfg = collectPricingFormData();
+        saveSiteConfigLocal(cfg);
+      }, 200);
+    }
+
+    // Live preview updates + auto-save locally as user types
     servicesGrid.querySelectorAll('.rate-editor-card').forEach(card => {
       const idx = card.getAttribute('data-service-idx');
       const updateCardPreview = () => {
@@ -1065,6 +1079,7 @@ function initPricingManager() {
         if (pv) {
           pv.innerHTML = `${escapeHtml(prefix)}${escapeHtml(curSym)}${price.toLocaleString('en-IN')} <small style="font-size:0.74rem; color:var(--admin-text-muted);">${escapeHtml(unit)}</small>`;
         }
+        scheduleAutoSaveLocal();
       };
       card.querySelectorAll('input').forEach(inp => inp.addEventListener('input', updateCardPreview));
     });
@@ -1079,8 +1094,13 @@ function initPricingManager() {
         if (pv) {
           pv.innerHTML = `${escapeHtml(curSym)}${price.toLocaleString('en-IN')} <span style="text-decoration:line-through; opacity:0.5; font-size:0.8rem;">${escapeHtml(curSym)}${orig.toLocaleString('en-IN')}</span>`;
         }
+        scheduleAutoSaveLocal();
       };
       card.querySelectorAll('input').forEach(inp => inp.addEventListener('input', updateBundlePreview));
+    });
+
+    [discountEl, seoSprintEl, webhookEl].forEach(el => {
+      if (el) el.addEventListener('input', scheduleAutoSaveLocal);
     });
   }
 
