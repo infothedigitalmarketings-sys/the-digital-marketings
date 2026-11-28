@@ -355,9 +355,9 @@ async function ghGetFile(path) {
 
 async function ghPutFile(path, contentStr, message) {
   const { owner, repo, branch, token } = getGhSettings();
-  if (!token) throw new Error('GitHub token configure nahi hai. "Storage & GitHub Sync" tab me token dalein.');
+  if (!token) throw new Error('GitHub token save nahi hai. "Storage & GitHub Sync" tab me jaakar Token dalein.');
 
-  const existing = await ghGetFile(path).catch(() => null);
+  const existing = await ghGetFile(path);
   const url = `https://api.github.com/repos/${encodeURIComponent(owner)}/${encodeURIComponent(repo)}/contents/${path}`;
 
   const body = {
@@ -1156,20 +1156,43 @@ function initPricingManager() {
 
   if (publishLiveBtn) {
     publishLiveBtn.addEventListener('click', async () => {
+      const statusBox = document.getElementById('pricingPublishStatus');
+      const setStatus = (msg, type) => {
+        if (!statusBox) return;
+        statusBox.style.display = 'block';
+        if (type === 'loading') {
+          statusBox.style.background = 'rgba(59, 130, 246, 0.12)';
+          statusBox.style.border = '1px solid rgba(59, 130, 246, 0.35)';
+          statusBox.style.color = '#93C5FD';
+        } else if (type === 'error') {
+          statusBox.style.background = 'rgba(239, 68, 68, 0.12)';
+          statusBox.style.border = '1px solid rgba(239, 68, 68, 0.35)';
+          statusBox.style.color = '#FCA5A5';
+        } else {
+          statusBox.style.background = 'rgba(16, 185, 129, 0.12)';
+          statusBox.style.border = '1px solid rgba(16, 185, 129, 0.35)';
+          statusBox.style.color = '#6EE7B7';
+        }
+        statusBox.textContent = msg;
+      };
+
       const cfg = collectPricingFormData();
       saveSiteConfigLocal(cfg);
       renderPricingEditor();
       try {
         publishLiveBtn.disabled = true;
         publishLiveBtn.textContent = '⏳ Publishing...';
+        setStatus('⏳ GitHub par live rates save ho rahe hain...', 'loading');
         await ghPutFile(
           'data/site-config.json',
           JSON.stringify(cfg, null, 2) + '\n',
           'Update live service rates & pricing via Admin Panel'
         );
-        showAdminToast('🚀 Live Rates GitHub repo me publish ho gaye! Ab sabhi visitors ko updated rates dikhenge.');
+        setStatus('✅ Live Website par publish ho gaya! GitHub Pages 30–60 seconds me update ho jayega, phir sabhi devices par naye rates dikhenge.', 'success');
+        showAdminToast('🚀 Live Rates GitHub repo me publish ho gaye!');
       } catch (err) {
-        showAdminToast(`Local preview saved, lekin GitHub publish nahi hua: ${err.message}`, true);
+        setStatus(`❌ GitHub par publish nahi hua: ${err.message}`, 'error');
+        showAdminToast(`GitHub publish failed: ${err.message}`, true);
       } finally {
         publishLiveBtn.disabled = false;
         publishLiveBtn.innerHTML = '<span>🚀 Save &amp; Publish Live (GitHub)</span>';
@@ -1749,10 +1772,21 @@ function initStorageAndBackup() {
     };
   }
 
+  // Auto-save GitHub settings on input/change so token is never lost even if user forgets to click Save
+  [ownerInput, repoInput, branchInput, tokenInput, autoSyncInput].forEach(el => {
+    if (!el) return;
+    const evt = el.type === 'checkbox' ? 'change' : 'input';
+    el.addEventListener(evt, () => {
+      saveGhSettings(readGhForm());
+      renderPricingEditorFn();
+    });
+  });
+
   if (saveGhBtn) {
     saveGhBtn.addEventListener('click', async () => {
       const cfg = readGhForm();
       saveGhSettings(cfg);
+      renderPricingEditorFn();
 
       if (!cfg.token) {
         logSync('Saved settings (Local Only — token empty).');
