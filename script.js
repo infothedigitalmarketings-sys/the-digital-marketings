@@ -898,6 +898,15 @@ function recordAnalyticsEvent(type, meta = {}) {
 
   if (data.events.length > 200) data.events = data.events.slice(0, 200);
   saveStoredAnalytics(data);
+
+  if (window.location.protocol !== 'file:') {
+    fetch('/api/record-analytics', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ type, meta, url: window.location.pathname }),
+      keepalive: true
+    }).catch(() => {});
+  }
 }
 
 function recordCrmLead(leadData) {
@@ -967,6 +976,15 @@ function recordCrmLead(leadData) {
 
     leads.unshift(newLead);
     localStorage.setItem(TDM_STORAGE_KEYS.LEADS, JSON.stringify(leads));
+
+    if (window.location.protocol !== 'file:') {
+      fetch('/api/record-lead', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(newLead),
+        keepalive: true
+      }).catch(() => {});
+    }
 
     if (TDM_LIVE_CONFIG && TDM_LIVE_CONFIG.leadWebhookUrl) {
       fetch(TDM_LIVE_CONFIG.leadWebhookUrl, {

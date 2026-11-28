@@ -104,7 +104,7 @@ const DEFAULT_SITE_CONFIG = {
       id: 'website',
       name: 'Website Creation (User Side)',
       builderName: 'Website Creation (User-Side Frontend)',
-      price: 2999,
+      price: 5999,
       unit: 'starting',
       shortUnit: ' starting',
       prefix: '',
@@ -269,6 +269,38 @@ function saveBlogsDataLocal(blogsData) {
   localStorage.setItem(TDM_ADMIN_KEYS.BLOGS, JSON.stringify(blogsData));
 }
 
+let TDM_DIRECT_SERVER = false;
+
+async function detectDirectServer() {
+  if (window.location.protocol === 'file:') {
+    TDM_DIRECT_SERVER = false;
+    return false;
+  }
+  try {
+    const res = await fetch('/api/health', { cache: 'no-store' });
+    if (res.ok) {
+      const data = await res.json();
+      TDM_DIRECT_SERVER = Boolean(data && data.ok);
+      return TDM_DIRECT_SERVER;
+    }
+  } catch (e) {}
+  TDM_DIRECT_SERVER = false;
+  return false;
+}
+
+async function postDirectApi(endpoint, payload) {
+  const res = await fetch(endpoint, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload)
+  });
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok || !data.ok) {
+    throw new Error(data.error || `Direct server save failed (${res.status})`);
+  }
+  return data;
+}
+
 function getGhSettings() {
   return safeJsonParse(localStorage.getItem(TDM_ADMIN_KEYS.GH_SYNC), {
     owner: 'infothedigitalmarketings-sys',
@@ -290,6 +322,16 @@ function updateSyncStatusUI() {
   const navBadge = document.getElementById('navSyncBadge');
   const sidebarStatus = document.getElementById('sidebarSyncStatus');
   const pill = document.getElementById('ghConnectionPill');
+
+  if (TDM_DIRECT_SERVER) {
+    if (navBadge) navBadge.textContent = 'Direct';
+    if (sidebarStatus) sidebarStatus.textContent = '● Direct Server Active';
+    if (pill) {
+      pill.textContent = 'Direct Server (No Token)';
+      pill.className = 'status-badge status-converted';
+    }
+    return;
+  }
 
   if (navBadge) {
     navBadge.textContent = hasToken ? (cfg.autoSync ? 'Auto' : 'GitHub') : 'Local';
@@ -387,6 +429,21 @@ async function ghPutFile(path, contentStr, message) {
 }
 
 async function maybeAutoSyncFile(path, payloadObj, message) {
+  if (TDM_DIRECT_SERVER && path === 'data/leads.json') {
+    try {
+      await postDirectApi('/api/save-leads', payloadObj);
+      showAdminToast('✓ CRM Leads direct server par save ho gayi');
+    } catch (err) {
+      showAdminToast(`Direct save failed: ${err.message}`, true);
+    }
+    return;
+  }
+  if (TDM_DIRECT_SERVER && path === 'data/blogs.json') {
+    try {
+      await postDirectApi('/api/delete-blog', { blogsCatalog: payloadObj });
+    } catch (err) {}
+    return;
+  }
   const cfg = getGhSettings();
   if (!cfg.token || !cfg.autoSync) return;
   try {
@@ -451,6 +508,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   initClock();
   initPinLock();
   initTabNavigation();
+  await detectDirectServer();
   updateSyncStatusUI();
 
   await bootstrapRepoData();
@@ -907,12 +965,18 @@ function initLeadsCrm() {
         syncGithubBtn.disabled = true;
         syncGithubBtn.textContent = '⏳ Syncing...';
         const leads = getLeadsData();
-        await ghPutFile('data/leads.json', JSON.stringify({
+        const payload = {
           version: 1,
           updatedAt: new Date().toISOString(),
           leads
-        }, null, 2) + '\n', 'Sync CRM leads from Admin');
-        showAdminToast('✓ CRM Leads GitHub repo me save ho gayi!');
+        };
+        if (TDM_DIRECT_SERVER) {
+          await postDirectApi('/api/save-leads', payload);
+          showAdminToast('✓ CRM Leads direct server par save ho gayi (No Token)!');
+        } else {
+          await ghPutFile('data/leads.json', JSON.stringify(payload, null, 2) + '\n', 'Sync CRM leads from Admin');
+          showAdminToast('✓ CRM Leads GitHub repo me save ho gayi!');
+        }
       } catch (err) {
         showAdminToast(err.message, true);
       } finally {
@@ -987,9 +1051,11 @@ function initPricingManager() {
     if (webhookEl) webhookEl.value = cfg.leadWebhookUrl || '';
     if (lastUpdatedEl) {
       const ghCfg = getGhSettings();
-      const ghNote = ghCfg.token
-        ? '✅ GitHub Sync Connected — "Save & Publish Live" dabane par live website par sabhi visitors ko dikhega.'
-        : '⚠️ Sirf is browser me save hoga (Live sabhi users ke liye "Storage & GitHub Sync" tab me GitHub Token add karein).';
+      const ghNote = TDM_DIRECT_SERVER
+        ? '✅ Direct Server Mode Active — Bina kisi GitHub Token ke seedha save hoga.'
+        : (ghCfg.token
+          ? '✅ GitHub Sync Connected — "Save & Publish Live" dabane par live website par sabhi visitors ko dikhega.'
+          : '⚠️ Sirf is browser me save hoga (Bina token ke direct chalane ke liye start-admin.bat chalayein, ya GitHub Token me Contents: Read & write on karein).');
       const timeNote = cfg.updatedAt
         ? `Last updated: ${new Date(cfg.updatedAt).toLocaleString('en-IN')}`
         : 'Default configuration loaded';
@@ -1182,17 +1248,24 @@ function initPricingManager() {
       try {
         publishLiveBtn.disabled = true;
         publishLiveBtn.textContent = '⏳ Publishing...';
-        setStatus('⏳ GitHub par live rates save ho rahe hain...', 'loading');
-        await ghPutFile(
-          'data/site-config.json',
-          JSON.stringify(cfg, null, 2) + '\n',
-          'Update live service rates & pricing via Admin Panel'
-        );
-        setStatus('✅ Live Website par publish ho gaya! GitHub Pages 30–60 seconds me update ho jayega, phir sabhi devices par naye rates dikhenge.', 'success');
-        showAdminToast('🚀 Live Rates GitHub repo me publish ho gaye!');
+        if (TDM_DIRECT_SERVER) {
+          setStatus('⏳ Direct server par rates save ho rahe hain...', 'loading');
+          await postDirectApi('/api/save-config', cfg);
+          setStatus('✅ Direct Server par rates save ho gaye! Bina kisi token ke website turant update ho gayi.', 'success');
+          showAdminToast('✅ Rates direct server par save ho gaye!');
+        } else {
+          setStatus('⏳ GitHub par live rates save ho rahe hain...', 'loading');
+          await ghPutFile(
+            'data/site-config.json',
+            JSON.stringify(cfg, null, 2) + '\n',
+            'Update live service rates & pricing via Admin Panel'
+          );
+          setStatus('✅ Live Website par publish ho gaya! GitHub Pages 30–60 seconds me update ho jayega, phir sabhi devices par naye rates dikhenge.', 'success');
+          showAdminToast('🚀 Live Rates GitHub repo me publish ho gaye!');
+        }
       } catch (err) {
-        setStatus(`❌ GitHub par publish nahi hua: ${err.message}`, 'error');
-        showAdminToast(`GitHub publish failed: ${err.message}`, true);
+        setStatus(`❌ Publish nahi hua: ${err.message}`, 'error');
+        showAdminToast(`Publish failed: ${err.message}`, true);
       } finally {
         publishLiveBtn.disabled = false;
         publishLiveBtn.innerHTML = '<span>🚀 Save &amp; Publish Live (GitHub)</span>';
@@ -1502,6 +1575,25 @@ function initBlogManager() {
 
       saveBlogsDataLocal({ ...repoBlogsPayload, posts: blogsData.posts });
       renderPublishedBlogsList();
+
+      if (TDM_DIRECT_SERVER) {
+        try {
+          publishLiveBtn.disabled = true;
+          publishLiveBtn.textContent = '⏳ Publishing...';
+          await postDirectApi('/api/publish-blog', {
+            slug: b.slug,
+            htmlContent: htmlCode,
+            blogsCatalog: repoBlogsPayload
+          });
+          showAdminToast(`🚀 Blog "${b.slug}.html" bina token ke direct server par publish ho gaya!`);
+        } catch (err) {
+          showAdminToast(`Direct blog publish fail hua: ${err.message}`, true);
+        } finally {
+          publishLiveBtn.disabled = false;
+          publishLiveBtn.innerHTML = '<span>🚀 Publish Live to Website</span>';
+        }
+        return;
+      }
 
       const ghCfg = getGhSettings();
       if (!ghCfg.token) {

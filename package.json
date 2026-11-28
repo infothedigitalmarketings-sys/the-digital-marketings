@@ -1,0 +1,12 @@
+{
+  "name": "the-digital-marketings",
+  "version": "1.0.0",
+  "description": "The Digital Marketings website and Admin Control Suite with direct JSON storage",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
