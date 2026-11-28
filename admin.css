@@ -2393,5 +2393,107 @@ body {
   }
 }
 
+/* --------------------------------------------------------------------------
+   LIVE RATES MANAGER & GITHUB STORAGE SYNC STYLES
+   -------------------------------------------------------------------------- */
+.rates-editor-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 18px;
+}
+
+.rate-editor-card {
+  background-color: var(--admin-bg-input);
+  border: 1px solid var(--admin-border);
+  border-radius: var(--radius-md);
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  transition: border-color 0.2s ease, transform 0.2s ease;
+}
+
+.rate-editor-card:hover {
+  border-color: var(--admin-primary-border);
+  transform: translateY(-2px);
+}
+
+.rate-card-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--admin-border-subtle);
+}
+
+.rate-card-id {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--admin-primary);
+  background: var(--admin-primary-dim);
+  padding: 3px 9px;
+  border-radius: var(--radius-pill);
+}
+
+.rate-card-preview {
+  font-family: var(--font-heading);
+  font-weight: 800;
+  font-size: 1.05rem;
+  color: var(--admin-text-main);
+}
+
+.dynamic-blog-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 10px 12px;
+  background: var(--admin-bg-input);
+  border: 1px solid var(--admin-border);
+  border-radius: var(--radius-sm);
+  font-size: 0.83rem;
+}
+
+.admin-toast-container {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  z-index: 10000;
+  max-width: 360px;
+}
+
+.admin-toast {
+  background: var(--admin-bg-elevated);
+  border: 1px solid var(--admin-primary-border);
+  color: var(--admin-text-main);
+  padding: 12px 16px;
+  border-radius: var(--radius-md);
+  font-size: 0.86rem;
+  font-weight: 600;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.55);
+  animation: fadeIn 0.25s ease;
+}
+
+.admin-toast.error {
+  border-color: rgba(239, 68, 68, 0.5);
+  color: #FCA5A5;
+}
+
+@media (max-width: 960px) {
+  .form-grid-4,
+  .form-grid-3,
+  .form-grid-2,
+  .blog-editor-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+
 
 

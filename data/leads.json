@@ -1,0 +1,45 @@
+{
+  "version": 1,
+  "updatedAt": "2026-11-28T10:00:00.000Z",
+  "leads": [
+    {
+      "id": "LEAD-1001",
+      "name": "Rajesh Patel",
+      "phone": "+91 98250 12345",
+      "email": "rajesh@pateltextiles.com",
+      "website": "https://pateltextiles.com",
+      "keywords": "textile exporter ahmedabad, cotton fabrics bulk",
+      "service": "Fast Google Keyword Ranking & SEO",
+      "notes": "Wants #1 position in 45 days for B2B export keywords.",
+      "source": "index.html",
+      "date": "2026-11-28T05:00:00.000Z",
+      "status": "New"
+    },
+    {
+      "id": "LEAD-1002",
+      "name": "Pooja Shah",
+      "phone": "+91 99090 98765",
+      "email": "pooja@shahluxurydental.com",
+      "website": "https://shahluxurydental.in",
+      "keywords": "best dental clinic ahmedabad, smile makeover",
+      "service": "Google My Business (GMB 3-Pack)",
+      "notes": "Wants more direct phone calls & Google Maps ranking.",
+      "source": "gmb-services.html",
+      "date": "2026-11-27T12:00:00.000Z",
+      "status": "Contacted"
+    },
+    {
+      "id": "LEAD-1003",
+      "name": "Amit Verma",
+      "phone": "+91 97240 55443",
+      "email": "amit@vermatechsolutions.com",
+      "website": "https://vermatech.io",
+      "keywords": "saas software development, custom erp india",
+      "service": "Google Ads & PPC Management",
+      "notes": "High intent leads needed, starting budget 50k/mo.",
+      "source": "google-ads.html",
+      "date": "2026-11-26T10:00:00.000Z",
+      "status": "Converted"
+    }
+  ]
+}

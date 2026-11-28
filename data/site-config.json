@@ -1,0 +1,93 @@
+{
+  "version": 1,
+  "updatedAt": "2026-11-28T10:00:00.000Z",
+  "currency": "₹",
+  "bundleDiscountPercent": 15,
+  "seoSprintPrice": 14999,
+  "leadWebhookUrl": "",
+  "services": [
+    {
+      "id": "smm",
+      "name": "Social Media Marketing",
+      "builderName": "Social Media Marketing (SMM)",
+      "price": 3999,
+      "unit": "/ monthly",
+      "shortUnit": "/mo",
+      "prefix": "",
+      "note": ""
+    },
+    {
+      "id": "gmb",
+      "name": "Google Business Profile (GMB)",
+      "builderName": "Google Business Profile (GMB) Optimization",
+      "price": 2499,
+      "unit": "/ monthly",
+      "shortUnit": "/mo",
+      "prefix": "",
+      "note": ""
+    },
+    {
+      "id": "google-ads",
+      "name": "Google Ads Management",
+      "builderName": "Google Ads Campaign Management",
+      "price": 2499,
+      "unit": "/ monthly",
+      "shortUnit": "/mo",
+      "prefix": "",
+      "note": "(Ad Budget Excluded)"
+    },
+    {
+      "id": "meta-ads",
+      "name": "Meta Ads (FB & Instagram)",
+      "builderName": "Meta Ads (Facebook & Instagram)",
+      "price": 2499,
+      "unit": "/ monthly",
+      "shortUnit": "/mo",
+      "prefix": "",
+      "note": "(Ad Budget Excluded)"
+    },
+    {
+      "id": "seo",
+      "name": "Website SEO (Search Engine)",
+      "builderName": "Website SEO & Fast Keyword Ranking",
+      "price": 4999,
+      "unit": "/ monthly",
+      "shortUnit": "/mo",
+      "prefix": "Starting from ",
+      "note": ""
+    },
+    {
+      "id": "website",
+      "name": "Website Creation (User Side)",
+      "builderName": "Website Creation (User-Side Frontend)",
+      "price": 2999,
+      "unit": "starting",
+      "shortUnit": " starting",
+      "prefix": "",
+      "note": "(Domain, Hosting & Admin Panel Excluded)"
+    }
+  ],
+  "bundles": [
+    {
+      "id": "local-social-duo",
+      "name": "Local & Social Growth Duo",
+      "price": 5499,
+      "originalPrice": 6498,
+      "unit": "/ month"
+    },
+    {
+      "id": "ads-duo",
+      "name": "Google + Meta Ads Duo",
+      "price": 4249,
+      "originalPrice": 4998,
+      "unit": "/ month"
+    },
+    {
+      "id": "complete-360",
+      "name": "Complete 360° Suite",
+      "price": 16499,
+      "originalPrice": 19494,
+      "unit": "/ month"
+    }
+  ]
+}

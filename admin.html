@@ -74,6 +74,10 @@
           <span>Client Leads & CRM</span>
           <span class="nav-item-badge" id="navLeadsBadge">24</span>
         </button>
+        <button type="button" class="nav-item-btn" data-tab="pricing">
+          <span class="nav-icon">💸</span>
+          <span>Live Rates & Pricing</span>
+        </button>
         <button type="button" class="nav-item-btn" data-tab="blog">
           <span class="nav-icon">✍️</span>
           <span>Blog Manager</span>
@@ -82,14 +86,19 @@
           <span class="nav-icon">🧾</span>
           <span>Invoice Generator</span>
         </button>
+        <button type="button" class="nav-item-btn" data-tab="storage">
+          <span class="nav-icon">☁️</span>
+          <span>Storage & GitHub Sync</span>
+          <span class="nav-item-badge" id="navSyncBadge">Local</span>
+        </button>
       </nav>
 
       <div class="sidebar-footer">
         <div class="live-status-card">
           <div class="pulse-indicator"></div>
           <div class="live-status-text">
-            Tracker Engine
-            <span>● Synchronized Live</span>
+            Storage Engine
+            <span id="sidebarSyncStatus">● Local + Repo Ready</span>
           </div>
         </div>
         <a href="index.html" class="quick-site-link" target="_blank">
@@ -252,6 +261,9 @@
               <button type="button" class="btn-secondary" id="exportLeadsCsvBtn">
                 📥 Export CSV
               </button>
+              <button type="button" class="btn-outline-cyber" id="syncLeadsGithubBtn">
+                ☁️ Sync to GitHub
+              </button>
             </div>
           </div>
 
@@ -381,15 +393,32 @@
             </div>
 
             <div class="admin-form-group">
+              <label class="admin-label" for="blogImage">Featured Image Path / URL</label>
+              <select id="blogImage" class="admin-select">
+                <option value="assets/seo_ranking_guide.jpg">assets/seo_ranking_guide.jpg (SEO Ranking)</option>
+                <option value="assets/omnichannel_growth.jpg">assets/omnichannel_growth.jpg (360° Growth)</option>
+                <option value="assets/ai_search_geo_guide.jpg">assets/ai_search_geo_guide.jpg (AI Search / GEO)</option>
+                <option value="assets/whatsapp_marketing_india.jpg">assets/whatsapp_marketing_india.jpg (WhatsApp Marketing)</option>
+                <option value="assets/local_seo_maps.jpg">assets/local_seo_maps.jpg (Local Maps & GMB)</option>
+                <option value="assets/ads_vs_seo.jpg">assets/ads_vs_seo.jpg (Google Ads vs SEO)</option>
+                <option value="assets/meta_ctr_guide.jpg">assets/meta_ctr_guide.jpg (Meta CTR Guide)</option>
+                <option value="assets/mobile_speed_seo.jpg">assets/mobile_speed_seo.jpg (Mobile Speed)</option>
+              </select>
+            </div>
+
+            <div class="admin-form-group">
               <label class="admin-label" for="blogContent">Blog Body Content (HTML / Text)</label>
               <textarea id="blogContent" class="admin-textarea" style="min-height: 220px;" placeholder="Write headings, paragraphs, bullet points, and actionable tips..."></textarea>
             </div>
 
-            <div style="display: flex; gap: 12px; margin-top: 10px;">
-              <button type="button" class="btn-cyber" id="generateBlogHtmlBtn">
-                <span>⚡ Build & Preview Complete HTML</span>
+            <div style="display: flex; gap: 12px; margin-top: 10px; flex-wrap: wrap;">
+              <button type="button" class="btn-cyber" id="publishBlogLiveBtn">
+                <span>🚀 Publish Live to Website</span>
               </button>
-              <button type="button" class="btn-outline-cyber" id="downloadBlogHtmlFileBtn">
+              <button type="button" class="btn-outline-cyber" id="generateBlogHtmlBtn">
+                <span>⚡ Preview HTML Code</span>
+              </button>
+              <button type="button" class="btn-secondary" id="downloadBlogHtmlFileBtn">
                 <span>📥 Download .html File</span>
               </button>
             </div>
@@ -427,15 +456,20 @@
               </div>
             </div>
 
-            <!-- Existing Blogs Reference -->
+            <!-- Existing & Dynamic Published Blogs -->
             <div class="admin-card">
               <div class="admin-card-header">
                 <div class="card-title-wrap">
-                  <h3 class="admin-card-title">📚 Published Blogs in Workspace</h3>
-                  <p class="admin-card-subtitle">6 Live high-ranking articles</p>
+                  <h3 class="admin-card-title">📚 Published Blogs on Website</h3>
+                  <p class="admin-card-subtitle">Admin-published blogs + workspace articles</p>
                 </div>
               </div>
-              <div style="display: flex; flex-direction: column; gap: 8px; font-size: 0.85rem;">
+              <div id="dynamicPublishedBlogsList" style="display: flex; flex-direction: column; gap: 8px; margin-bottom: 14px;">
+                <!-- Populated by JS from data/blogs.json + localStorage -->
+              </div>
+              <div style="display: flex; flex-direction: column; gap: 8px; font-size: 0.85rem; padding-top: 10px; border-top: 1px solid var(--admin-border);">
+                <a href="blog-whatsapp-marketing-automation-india.html" target="_blank" style="color: var(--admin-primary);">📄 blog-whatsapp-marketing-automation-india.html</a>
+                <a href="blog-ai-search-geo-optimization-india.html" target="_blank" style="color: var(--admin-primary);">📄 blog-ai-search-geo-optimization-india.html</a>
                 <a href="blog-30-day-seo-ranking.html" target="_blank" style="color: var(--admin-primary);">📄 blog-30-day-seo-ranking.html</a>
                 <a href="blog-360-omnichannel-marketing.html" target="_blank" style="color: var(--admin-primary);">📄 blog-360-omnichannel-marketing.html</a>
                 <a href="blog-ahmedabad-local-seo-google-maps.html" target="_blank" style="color: var(--admin-primary);">📄 blog-ahmedabad-local-seo-google-maps.html</a>
@@ -481,6 +515,10 @@
 
             <label class="admin-label" style="margin: 0;">Discount %:</label>
             <input type="number" id="invDiscountPercent" class="admin-input" value="0" min="0" max="100" style="width: 80px;">
+
+            <select id="invLoadServiceSelect" class="admin-select" style="width: 220px;">
+              <option value="">+ Quick Add Live Service Rate...</option>
+            </select>
           </div>
 
           <div style="display: flex; gap: 12px;">
@@ -602,8 +640,186 @@
         </div>
       </section>
 
+      <!-- ====================================================================
+           VIEW 5: LIVE RATES & PRICING MANAGER
+           ==================================================================== -->
+      <section class="admin-content-view" id="view-pricing">
+        <div class="admin-card" style="margin-bottom: 24px;">
+          <div class="admin-card-header" style="flex-wrap: wrap;">
+            <div class="card-title-wrap">
+              <h3 class="admin-card-title">💸 Live Website Rates & Pricing Control</h3>
+              <p class="admin-card-subtitle">Yahan se rate edit karne par Home, Pricing, Services, aur Dedicated Service pages par automatic update hoga</p>
+            </div>
+            <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+              <button type="button" class="btn-secondary" id="resetRatesBtn">
+                🔄 Reload Repo Rates
+              </button>
+              <button type="button" class="btn-outline-cyber" id="saveRatesLocalBtn">
+                💾 Save Local Preview
+              </button>
+              <button type="button" class="btn-cyber" id="publishRatesLiveBtn">
+                🚀 Save &amp; Publish Live (GitHub)
+              </button>
+            </div>
+          </div>
+
+          <div class="form-grid-4" style="margin-bottom: 10px;">
+            <div class="admin-form-group">
+              <label class="admin-label" for="cfgCurrency">Currency Symbol</label>
+              <select id="cfgCurrency" class="admin-select">
+                <option value="₹">₹ (INR)</option>
+                <option value="$">$ (USD)</option>
+                <option value="AED">AED</option>
+                <option value="€">€ (EUR)</option>
+                <option value="£">£ (GBP)</option>
+              </select>
+            </div>
+            <div class="admin-form-group">
+              <label class="admin-label" for="cfgBundleDiscount">Combo Bundle Discount (%)</label>
+              <input type="number" id="cfgBundleDiscount" class="admin-input" min="0" max="90" value="15">
+            </div>
+            <div class="admin-form-group">
+              <label class="admin-label" for="cfgSeoSprintPrice">SEO Sprint Package Rate</label>
+              <input type="number" id="cfgSeoSprintPrice" class="admin-input" min="0" step="100" value="14999">
+            </div>
+            <div class="admin-form-group">
+              <label class="admin-label" for="cfgLeadWebhook">Optional Lead Webhook URL</label>
+              <input type="url" id="cfgLeadWebhook" class="admin-input" placeholder="https://script.google.com/... (optional)">
+            </div>
+          </div>
+          <div style="font-size: 0.78rem; color: var(--admin-text-muted);" id="pricingLastUpdatedNote">
+            Last synced: Not yet modified
+          </div>
+        </div>
+
+        <!-- 6 Core Services Editor -->
+        <div class="admin-card" style="margin-bottom: 24px;">
+          <div class="admin-card-header">
+            <div class="card-title-wrap">
+              <h3 class="admin-card-title">⚡ 6 Core Services Live Rates</h3>
+              <p class="admin-card-subtitle">Edit price, display unit, prefix, or exclusion note for every core service</p>
+            </div>
+          </div>
+          <div class="rates-editor-grid" id="coreServicesRatesGrid">
+            <!-- Dynamically populated by admin.js -->
+          </div>
+        </div>
+
+        <!-- 3 Combo Bundles Editor -->
+        <div class="admin-card">
+          <div class="admin-card-header">
+            <div class="card-title-wrap">
+              <h3 class="admin-card-title">🌟 3 Combo Bundles Live Rates</h3>
+              <p class="admin-card-subtitle">Pricing page par dikhne wale combo packages ke rates &amp; strikethrough MRP update karein</p>
+            </div>
+          </div>
+          <div class="rates-editor-grid" id="comboBundlesRatesGrid">
+            <!-- Dynamically populated by admin.js -->
+          </div>
+        </div>
+      </section>
+
+      <!-- ====================================================================
+           VIEW 6: STORAGE & GITHUB REPO SYNC
+           ==================================================================== -->
+      <section class="admin-content-view" id="view-storage">
+        <div class="blog-editor-layout">
+          <div class="admin-card">
+            <div class="admin-card-header">
+              <div class="card-title-wrap">
+                <h3 class="admin-card-title">☁️ GitHub Repository Sync Setup</h3>
+                <p class="admin-card-subtitle">Token sirf aapke browser ke localStorage me secure rehta hai — repo me commit nahi hota</p>
+              </div>
+              <span class="status-badge status-new" id="ghConnectionPill">Not Connected</span>
+            </div>
+
+            <div class="form-grid-3">
+              <div class="admin-form-group">
+                <label class="admin-label" for="ghOwner">GitHub Username / Owner</label>
+                <input type="text" id="ghOwner" class="admin-input" value="infothedigitalmarketings-sys">
+              </div>
+              <div class="admin-form-group">
+                <label class="admin-label" for="ghRepo">Repository Name</label>
+                <input type="text" id="ghRepo" class="admin-input" value="the-digital-marketings">
+              </div>
+              <div class="admin-form-group">
+                <label class="admin-label" for="ghBranch">Branch</label>
+                <input type="text" id="ghBranch" class="admin-input" value="main">
+              </div>
+            </div>
+
+            <div class="admin-form-group">
+              <label class="admin-label" for="ghToken">GitHub Personal Access Token (Fine-grained / Classic with `repo` contents write)</label>
+              <input type="password" id="ghToken" class="admin-input" placeholder="github_pat_... or ghp_...">
+            </div>
+
+            <label style="display: flex; align-items: center; gap: 10px; font-size: 0.86rem; color: var(--admin-text-body); margin-bottom: 18px; cursor: pointer;">
+              <input type="checkbox" id="ghAutoSync" style="width: 16px; height: 16px; accent-color: var(--admin-primary);">
+              <span>Auto-sync Leads, Rates &amp; Blogs to GitHub automatically on save</span>
+            </label>
+
+            <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+              <button type="button" class="btn-cyber" id="saveGhConfigBtn">
+                <span>💾 Save &amp; Test Connection</span>
+              </button>
+              <button type="button" class="btn-outline-cyber" id="pullAllGithubBtn">
+                <span>⬇️ Pull All Data from GitHub</span>
+              </button>
+              <button type="button" class="btn-secondary" id="pushAllGithubBtn">
+                <span>⬆️ Push All Data to GitHub</span>
+              </button>
+            </div>
+
+            <div id="ghSyncLog" style="margin-top: 16px; padding: 12px; background: var(--admin-bg-input); border: 1px solid var(--admin-border); border-radius: 8px; font-size: 0.8rem; color: var(--admin-text-body); min-height: 54px;">
+              Ready. Token enter karke "Save &amp; Test Connection" par click karein.
+            </div>
+          </div>
+
+          <div style="display: flex; flex-direction: column; gap: 24px;">
+            <!-- Local Backup & Restore -->
+            <div class="admin-card">
+              <div class="admin-card-header">
+                <div class="card-title-wrap">
+                  <h3 class="admin-card-title">🗄️ Full JSON Backup &amp; Restore</h3>
+                  <p class="admin-card-subtitle">All Rates, Leads, Analytics &amp; Blogs ek file me export/import karein</p>
+                </div>
+              </div>
+              <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                <button type="button" class="btn-outline-cyber" id="downloadFullBackupBtn">
+                  <span>📥 Export Full Backup (.json)</span>
+                </button>
+                <label class="btn-secondary" style="cursor: pointer;">
+                  <span>📤 Restore Backup (.json)</span>
+                  <input type="file" id="restoreBackupInput" accept="application/json,.json" style="display: none;">
+                </label>
+              </div>
+            </div>
+
+            <!-- Security PIN Update -->
+            <div class="admin-card">
+              <div class="admin-card-header">
+                <div class="card-title-wrap">
+                  <h3 class="admin-card-title">🔐 Admin PIN Security</h3>
+                  <p class="admin-card-subtitle">Default PIN (1234) ko apni pasand ke 4-digit PIN se badlein</p>
+                </div>
+              </div>
+              <div style="display: flex; gap: 10px; align-items: flex-end;">
+                <div class="admin-form-group" style="margin-bottom: 0; flex: 1;">
+                  <label class="admin-label" for="newAdminPinInput">New 4-Digit PIN</label>
+                  <input type="password" id="newAdminPinInput" maxlength="4" pattern="\d{4}" class="admin-input" placeholder="e.g. 5678">
+                </div>
+                <button type="button" class="btn-cyber" id="updatePinBtn">Update PIN</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
     </main>
   </div>
+
+  <!-- Toast Notification Container -->
+  <div id="adminToastContainer" class="admin-toast-container" aria-live="polite"></div>
 
   <script src="admin.js"></script>
 </body>

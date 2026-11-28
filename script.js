@@ -8,6 +8,11 @@
  * - Audit Modals & Multi-Channel Lead Dispatcher (WhatsApp / Email)
  */
 
+let TDM_ACTIVE_CURRENCY = '₹';
+let TDM_ACTIVE_DISCOUNT_PCT = 15;
+let TDM_LIVE_CONFIG = null;
+let tdmRefreshPricingBuilderFn = null;
+
 document.addEventListener('DOMContentLoaded', () => {
   initHeroDynamicEngine();
   initCounters();
@@ -20,6 +25,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initLeadForms();
   initScrollEffects();
   initSiteAnalyticsTracker();
+  initLiveSiteSync();
 });
 
 /* --------------------------------------------------------------------------
@@ -336,21 +342,23 @@ function initPricingPackageBuilder() {
       }
     });
 
-    // 15% bundle discount if 2 or more services selected
+    // Dynamic bundle discount if 2 or more services selected
     let discount = 0;
-    if (selectedCount >= 2) {
-      discount = Math.round(subtotal * 0.15);
+    const discountRate = (TDM_ACTIVE_DISCOUNT_PCT || 0) / 100;
+    if (selectedCount >= 2 && discountRate > 0) {
+      discount = Math.round(subtotal * discountRate);
       if (discountRow) discountRow.style.display = 'flex';
     } else {
       if (discountRow) discountRow.style.display = 'none';
     }
 
     const total = subtotal - discount;
+    const cur = TDM_ACTIVE_CURRENCY || '₹';
 
     // Update UI elements
-    if (subtotalEl) subtotalEl.textContent = '₹' + subtotal.toLocaleString('en-IN');
-    if (discountEl) discountEl.textContent = '-₹' + discount.toLocaleString('en-IN');
-    if (totalEl) totalEl.textContent = '₹' + total.toLocaleString('en-IN');
+    if (subtotalEl) subtotalEl.textContent = cur + subtotal.toLocaleString('en-IN');
+    if (discountEl) discountEl.textContent = '-' + cur + discount.toLocaleString('en-IN');
+    if (totalEl) totalEl.textContent = cur + total.toLocaleString('en-IN');
 
     // Populate selected services list
     if (selectedListEl) {
@@ -360,7 +368,7 @@ function initPricingPackageBuilder() {
         selectedListEl.innerHTML = selectedItems.map(item => `
           <div class="selected-item-row">
             <span>• ${item.name}</span>
-            <strong>₹${item.price.toLocaleString('en-IN')}</strong>
+            <strong>${cur}${item.price.toLocaleString('en-IN')}</strong>
           </div>
         `).join('');
       }
@@ -373,12 +381,14 @@ function initPricingPackageBuilder() {
           alert('Please select at least one service to book.');
           return;
         }
-        const serviceNames = selectedItems.map(i => `• ${i.name} (₹${i.price.toLocaleString('en-IN')})`).join('\n');
-        const message = `Hi Sabir Ajmeri / The Digital Marketings,%0A%0AI want to book this Custom Growth Package:%0A${encodeURIComponent(serviceNames)}%0A%0A*Total Estimated Investment:* ₹${total.toLocaleString('en-IN')}%0A%0APlease share the onboarding process and timeline.`;
+        const serviceNames = selectedItems.map(i => `• ${i.name} (${cur}${i.price.toLocaleString('en-IN')})`).join('\n');
+        const message = `Hi Sabir Ajmeri / The Digital Marketings,%0A%0AI want to book this Custom Growth Package:%0A${encodeURIComponent(serviceNames)}%0A%0A*Total Estimated Investment:* ${cur}${total.toLocaleString('en-IN')}%0A%0APlease share the onboarding process and timeline.`;
         window.open(`https://wa.me/919316954389?text=${message}`, '_blank');
       };
     }
   }
+
+  tdmRefreshPricingBuilderFn = updatePricing;
 
   cards.forEach(card => {
     const checkbox = card.querySelector('.service-check');
@@ -957,6 +967,15 @@ function recordCrmLead(leadData) {
 
     leads.unshift(newLead);
     localStorage.setItem(TDM_STORAGE_KEYS.LEADS, JSON.stringify(leads));
+
+    if (TDM_LIVE_CONFIG && TDM_LIVE_CONFIG.leadWebhookUrl) {
+      fetch(TDM_LIVE_CONFIG.leadWebhookUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(newLead),
+        keepalive: true
+      }).catch(() => {});
+    }
   } catch (e) {
     console.warn('Could not record CRM lead', e);
   }
@@ -1001,4 +1020,233 @@ function initSiteAnalyticsTracker() {
     });
   });
 }
+
+/* --------------------------------------------------------------------------
+   9. Live Website Rates & Dynamic Blog Sync Engine
+   -------------------------------------------------------------------------- */
+function escapeSiteHtml(str) {
+  return String(str || '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
+
+async function initLiveSiteSync() {
+  await Promise.all([syncLivePricingConfig(), syncDynamicBlogs()]);
+}
+
+async function syncLivePricingConfig() {
+  let repoConfig = null;
+  try {
+    const res = await fetch(`data/site-config.json?t=${Date.now()}`, { cache: 'no-store' });
+    if (res.ok) repoConfig = await res.json();
+  } catch (e) {
+    // Graceful fallback if opened via file:// or offline
+  }
+
+  let localConfig = null;
+  try {
+    const raw = localStorage.getItem('tdm_site_config_v1');
+    if (raw) localConfig = JSON.parse(raw);
+  } catch (e) {}
+
+  let activeConfig = repoConfig || localConfig;
+  if (repoConfig && localConfig) {
+    const repoTime = new Date(repoConfig.updatedAt || 0).getTime();
+    const localTime = new Date(localConfig.updatedAt || 0).getTime();
+    activeConfig = localTime > repoTime ? localConfig : repoConfig;
+  }
+
+  if (!activeConfig || !Array.isArray(activeConfig.services)) return;
+  TDM_LIVE_CONFIG = activeConfig;
+  applyLivePricingConfig(activeConfig);
+}
+
+function applyLivePricingConfig(config) {
+  const cur = config.currency || '₹';
+  const discountPct = Number(config.bundleDiscountPercent ?? 15);
+  TDM_ACTIVE_CURRENCY = cur;
+  TDM_ACTIVE_DISCOUNT_PCT = discountPct;
+
+  const serviceById = new Map((config.services || []).map(s => [s.id, s]));
+  const bundleById = new Map((config.bundles || []).map(b => [b.id, b]));
+
+  // Discount labels
+  document.querySelectorAll('[data-live-discount-pct]').forEach(el => {
+    el.textContent = String(discountPct);
+  });
+  document.querySelectorAll('[data-live-discount-label]').forEach(el => {
+    el.textContent = `Bundle Discount (${discountPct}% OFF):`;
+  });
+
+  // Custom Package Builder cards (index.html & pricing.html)
+  document.querySelectorAll('.service-checkbox-card[data-service-id]').forEach(card => {
+    const id = card.getAttribute('data-service-id');
+    const srv = serviceById.get(id);
+    if (!srv) return;
+    card.setAttribute('data-price', String(srv.price));
+    if (srv.builderName) card.setAttribute('data-name', srv.builderName);
+    const priceEl = card.querySelector('.check-price');
+    if (priceEl) {
+      priceEl.innerHTML = `${escapeSiteHtml(cur)}${Number(srv.price).toLocaleString('en-IN')}<small>${escapeSiteHtml(srv.shortUnit || '/mo')}</small>`;
+    }
+  });
+
+  if (typeof tdmRefreshPricingBuilderFn === 'function') {
+    tdmRefreshPricingBuilderFn();
+  }
+
+  // Individual Service Cards (pricing.html & services.html)
+  document.querySelectorAll('[data-live-service-card]').forEach(card => {
+    const id = card.getAttribute('data-live-service-card');
+    const srv = serviceById.get(id);
+    if (!srv) return;
+
+    const formatted = `${cur}${Number(srv.price).toLocaleString('en-IN')}`;
+    const priceTag = card.querySelector('.service-pricing-tag');
+    if (priceTag) {
+      const noteHtml = srv.note ? `<span style="display:block; font-size:0.75rem; color:var(--color-text-muted); margin-top:2px;">${escapeSiteHtml(srv.note)}</span>` : '';
+      priceTag.innerHTML = `${escapeSiteHtml(srv.prefix || '')}${escapeSiteHtml(formatted)} <small style="font-size: 0.85rem; color: var(--color-text-muted); font-weight: 500;">${escapeSiteHtml(srv.unit || '')}</small>${noteHtml}`;
+    }
+
+    const waBtn = card.querySelector('a[href*="wa.me"]');
+    if (waBtn) {
+      const waMsg = `Hi The Digital Marketings, I want ${srv.name} (${srv.prefix || ''}${formatted}${srv.shortUnit || '/mo'}).`;
+      waBtn.setAttribute('href', `https://wa.me/919316954389?text=${encodeURIComponent(waMsg)}`);
+      const btnSpan = waBtn.querySelector('span');
+      if (btnSpan && btnSpan.textContent.includes('₹')) {
+        btnSpan.textContent = btnSpan.textContent.replace(/₹[\d,]+/g, formatted);
+      }
+    }
+  });
+
+  // Combo Bundle Cards (pricing.html)
+  document.querySelectorAll('[data-live-bundle-card]').forEach(card => {
+    const id = card.getAttribute('data-live-bundle-card');
+    const bnd = bundleById.get(id);
+    if (!bnd) return;
+
+    const formatted = `${cur}${Number(bnd.price).toLocaleString('en-IN')}`;
+    const origFormatted = `${cur}${Number(bnd.originalPrice || bnd.price).toLocaleString('en-IN')}`;
+    const titleEl = card.querySelector('.service-title');
+    if (titleEl) titleEl.textContent = bnd.name;
+
+    const priceTag = card.querySelector('.service-pricing-tag');
+    if (priceTag) {
+      priceTag.innerHTML = `${escapeSiteHtml(formatted)} <small style="font-size: 0.85rem; color: var(--color-text-muted); font-weight: 500;">${escapeSiteHtml(bnd.unit || '/ month')}</small> <span style="font-size:0.8rem; text-decoration:line-through; opacity:0.6; color:var(--color-text-body);">${escapeSiteHtml(origFormatted)}</span>`;
+    }
+
+    const waBtn = card.querySelector('a[href*="wa.me"]');
+    if (waBtn) {
+      const waMsg = `Hi The Digital Marketings, I want to book the ${bnd.name} (${formatted}/mo).`;
+      waBtn.setAttribute('href', `https://wa.me/919316954389?text=${encodeURIComponent(waMsg)}`);
+      const btnSpan = waBtn.querySelector('span');
+      if (btnSpan && btnSpan.textContent.includes('₹')) {
+        btnSpan.textContent = btnSpan.textContent.replace(/₹[\d,]+/g, formatted);
+      }
+    }
+  });
+
+  // Dedicated Service Pages Inline Prices
+  document.querySelectorAll('[data-live-inline-service]').forEach(el => {
+    const id = el.getAttribute('data-live-inline-service');
+    const srv = serviceById.get(id);
+    if (!srv) return;
+    const formatted = `${cur}${Number(srv.price).toLocaleString('en-IN')}`;
+    el.textContent = srv.unit && srv.unit !== 'starting' ? `${formatted} ${srv.unit}` : formatted;
+  });
+
+  document.querySelectorAll('[data-live-wa-service]').forEach(btn => {
+    const id = btn.getAttribute('data-live-wa-service');
+    const srv = serviceById.get(id);
+    if (!srv) return;
+    const formatted = `${cur}${Number(srv.price).toLocaleString('en-IN')}`;
+    const waMsg = `Hi The Digital Marketings, I want ${srv.name} (${formatted}${srv.shortUnit || '/mo'}).`;
+    btn.setAttribute('href', `https://wa.me/919316954389?text=${encodeURIComponent(waMsg)}`);
+  });
+
+  // SEO Sprint Dedicated Page Price
+  document.querySelectorAll('[data-live-seo-sprint]').forEach(el => {
+    if (config.seoSprintPrice != null) {
+      el.textContent = `${cur}${Number(config.seoSprintPrice).toLocaleString('en-IN')} / month`;
+    }
+  });
+}
+
+async function syncDynamicBlogs() {
+  const blogGrid = document.querySelector('.blog-grid');
+  if (!blogGrid) return;
+
+  let repoPosts = [];
+  try {
+    const res = await fetch(`data/blogs.json?t=${Date.now()}`, { cache: 'no-store' });
+    if (res.ok) {
+      const parsed = await res.json();
+      if (parsed && Array.isArray(parsed.posts)) repoPosts = parsed.posts;
+    }
+  } catch (e) {}
+
+  let localPosts = [];
+  try {
+    const raw = localStorage.getItem('tdm_blogs_v1');
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (parsed && Array.isArray(parsed.posts)) localPosts = parsed.posts;
+    }
+  } catch (e) {}
+
+  const mergedMap = new Map();
+  localPosts.forEach(p => mergedMap.set(p.slug, p));
+  repoPosts.forEach(p => {
+    if (!mergedMap.has(p.slug)) mergedMap.set(p.slug, p);
+  });
+
+  const posts = Array.from(mergedMap.values());
+  if (!posts.length) return;
+
+  const existingHrefs = new Set(Array.from(blogGrid.querySelectorAll('a[href]')).map(a => a.getAttribute('href')));
+  const newCardsHtml = posts
+    .filter(p => !existingHrefs.has(p.url))
+    .map(post => `
+      <article class="blog-card" data-dynamic-blog="${escapeSiteHtml(post.slug)}">
+        <a href="${escapeSiteHtml(post.url)}" class="blog-card-img-wrap" aria-label="Read ${escapeSiteHtml(post.title)}">
+          <img src="${escapeSiteHtml(post.image || 'assets/seo_ranking_guide.jpg')}" alt="${escapeSiteHtml(post.title)}" loading="lazy">
+        </a>
+        <div class="blog-card-content">
+          <div class="blog-meta-row">
+            <span class="blog-badge" style="background:rgba(210,250,21,0.12); color:var(--color-primary); border:1px solid rgba(210,250,21,0.3);">✨ ${escapeSiteHtml((post.category || 'SEO').toUpperCase())}</span>
+            <span class="blog-read-time">${escapeSiteHtml(post.readTime || '6 min read')}</span>
+          </div>
+          <h2 class="blog-title"><a href="${escapeSiteHtml(post.url)}">${escapeSiteHtml(post.title)}</a></h2>
+          <p class="blog-excerpt">${escapeSiteHtml(post.excerpt || '')}</p>
+          <div class="blog-footer">
+            <span class="blog-author">By ${escapeSiteHtml(post.author || 'Sabir Ajmeri')}</span>
+            <a href="${escapeSiteHtml(post.url)}" class="blog-read-link"><span>Read Full Article →</span></a>
+          </div>
+        </div>
+      </article>
+    `).join('');
+
+  if (newCardsHtml) {
+    blogGrid.insertAdjacentHTML('afterbegin', newCardsHtml);
+
+    // Local preview fallback if the static .html file hasn't been deployed yet
+    blogGrid.querySelectorAll('article[data-dynamic-blog] a').forEach(link => {
+      link.addEventListener('click', async (e) => {
+        const slug = link.closest('article').getAttribute('data-dynamic-blog');
+        const post = mergedMap.get(slug);
+        if (!post || !post.htmlContent) return;
+        try {
+          const check = await fetch(post.url, { method: 'HEAD', cache: 'no-store' });
+          if (check.ok) return;
+        } catch (err) {}
+        e.preventDefault();
+        const blob = new Blob([post.htmlContent], { type: 'text/html;charset=utf-8' });
+        window.open(URL.createObjectURL(blob), '_blank');
+      });
+    });
+  }
+}
+
 

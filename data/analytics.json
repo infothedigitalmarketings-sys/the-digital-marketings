@@ -1,0 +1,33 @@
+{
+  "version": 1,
+  "updatedAt": "2026-11-28T10:00:00.000Z",
+  "totalViews": 1420,
+  "uniqueVisitors": 890,
+  "pageViews": {},
+  "whatsappClicks": 164,
+  "callClicks": 98,
+  "auditModalOpens": 122,
+  "serviceClicks": 215,
+  "events": [
+    {
+      "type": "whatsapp_click",
+      "meta": { "page": "index.html" },
+      "timestamp": "2026-11-28T09:48:00.000Z"
+    },
+    {
+      "type": "lead_form_submit",
+      "meta": { "name": "Rajesh Patel", "service": "Fast Google SEO" },
+      "timestamp": "2026-11-28T09:15:00.000Z"
+    },
+    {
+      "type": "call_click",
+      "meta": { "page": "gmb-services.html" },
+      "timestamp": "2026-11-28T08:25:00.000Z"
+    },
+    {
+      "type": "audit_modal_open",
+      "meta": { "page": "blog-30-day-seo-ranking.html" },
+      "timestamp": "2026-11-28T07:00:00.000Z"
+    }
+  ]
+}
