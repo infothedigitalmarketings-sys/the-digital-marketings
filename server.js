@@ -187,6 +187,13 @@ async function handleApi(req, res, pathname) {
       return sendJson(res, 200, { ok: true });
     }
 
+    if (pathname === '/api/save-invoices') {
+      const invoices = Array.isArray(body.invoices) ? body.invoices : [];
+      const payload = { version: 1, updatedAt: new Date().toISOString(), invoices };
+      writeJsonFile('invoices.json', payload);
+      return sendJson(res, 200, { ok: true, count: invoices.length });
+    }
+
     return sendJson(res, 404, { ok: false, error: 'Unknown API endpoint' });
   } catch (err) {
     return sendJson(res, 400, { ok: false, error: err.message });

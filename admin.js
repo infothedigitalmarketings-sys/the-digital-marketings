@@ -39,6 +39,7 @@ const TDM_ADMIN_KEYS = {
   LEADS: 'tdm_leads_v1',
   SITE_CONFIG: 'tdm_site_config_v1',
   BLOGS: 'tdm_blogs_v1',
+  INVOICES: 'tdm_invoices_v1',
   GH_SYNC: 'tdm_github_sync_v1'
 };
 
@@ -269,6 +270,23 @@ function saveBlogsDataLocal(blogsData) {
   localStorage.setItem(TDM_ADMIN_KEYS.BLOGS, JSON.stringify(blogsData));
 }
 
+function getInvoicesData() {
+  const stored = safeJsonParse(localStorage.getItem(TDM_ADMIN_KEYS.INVOICES), null);
+  if (Array.isArray(stored)) return stored;
+  return [];
+}
+
+function saveInvoicesData(invoices, triggerAutoSync = true) {
+  localStorage.setItem(TDM_ADMIN_KEYS.INVOICES, JSON.stringify(invoices));
+  if (triggerAutoSync) {
+    maybeAutoSyncFile('data/invoices.json', {
+      version: 1,
+      updatedAt: new Date().toISOString(),
+      invoices
+    }, 'Update Estimates & Invoices history from Admin');
+  }
+}
+
 let TDM_DIRECT_SERVER = false;
 
 async function detectDirectServer() {
@@ -444,6 +462,15 @@ async function maybeAutoSyncFile(path, payloadObj, message) {
     } catch (err) {}
     return;
   }
+  if (TDM_DIRECT_SERVER && path === 'data/invoices.json') {
+    try {
+      await postDirectApi('/api/save-invoices', payloadObj);
+      showAdminToast('✓ Estimate/Invoice history direct server par save ho gayi');
+    } catch (err) {
+      showAdminToast(`Direct save failed: ${err.message}`, true);
+    }
+    return;
+  }
   const cfg = getGhSettings();
   if (!cfg.token || !cfg.autoSync) return;
   try {
@@ -465,11 +492,12 @@ async function fetchRepoJsonRelative(path) {
 }
 
 async function bootstrapRepoData() {
-  const [repoConfig, repoLeads, repoAnalytics, repoBlogs] = await Promise.all([
+  const [repoConfig, repoLeads, repoAnalytics, repoBlogs, repoInvoices] = await Promise.all([
     fetchRepoJsonRelative('data/site-config.json'),
     fetchRepoJsonRelative('data/leads.json'),
     fetchRepoJsonRelative('data/analytics.json'),
-    fetchRepoJsonRelative('data/blogs.json')
+    fetchRepoJsonRelative('data/blogs.json'),
+    fetchRepoJsonRelative('data/invoices.json')
   ]);
 
   if (repoConfig && Array.isArray(repoConfig.services)) {
@@ -497,6 +525,13 @@ async function bootstrapRepoData() {
     const localBlogs = safeJsonParse(localStorage.getItem(TDM_ADMIN_KEYS.BLOGS), null);
     if (!localBlogs || new Date(repoBlogs.updatedAt || 0) > new Date(localBlogs.updatedAt || 0)) {
       localStorage.setItem(TDM_ADMIN_KEYS.BLOGS, JSON.stringify(repoBlogs));
+    }
+  }
+
+  if (repoInvoices && Array.isArray(repoInvoices.invoices)) {
+    const localInvs = safeJsonParse(localStorage.getItem(TDM_ADMIN_KEYS.INVOICES), null);
+    if (!Array.isArray(localInvs) || localInvs.length === 0) {
+      localStorage.setItem(TDM_ADMIN_KEYS.INVOICES, JSON.stringify(repoInvoices.invoices));
     }
   }
 }
@@ -639,7 +674,7 @@ function initTabNavigation() {
     leads: { title: 'Client Leads & Inquiries CRM', subtitle: 'Manage inbound customer inquiries, follow-ups, and WhatsApp conversations' },
     pricing: { title: 'Live Website Rates & Pricing Manager', subtitle: 'Edit rates for all 6 services & 3 bundles — live site automatically syncs' },
     blog: { title: 'Blog Post Manager & Live Publisher', subtitle: 'Write, preview SERP snippets, and publish SEO articles directly to website' },
-    invoice: { title: 'Manual Professional Invoice Creator', subtitle: 'Create, calculate, and print agency client invoices with live service rates' },
+    invoice: { title: 'Estimate & Professional Invoice Studio', subtitle: 'Start with an Estimate or switch to Invoice/Tax Invoice — send directly on WhatsApp & Email' },
     storage: { title: 'Persistent Storage & GitHub Sync', subtitle: 'Sync Rates, Leads, Analytics & Blogs with your GitHub repository + JSON backups' }
   };
 
@@ -1017,6 +1052,7 @@ function initLeadsCrm() {
 
       saveLeadsData(leads);
       renderLeads();
+      populateInvoiceCrmPicker();
       manualLeadForm.reset();
       showAdminToast('✓ Client lead added to CRM!');
     });
@@ -1653,8 +1689,10 @@ function initBlogManager() {
 }
 
 /* --------------------------------------------------------------------------
-   8. Manual Professional Invoice Generator (Print / PDF + Live Rates)
+   8. Estimate & Professional Invoice Studio (CRM + WhatsApp + Email + PDF)
    -------------------------------------------------------------------------- */
+let renderSavedInvoicesFn = () => {};
+
 function populateInvoiceServicePicker() {
   const picker = document.getElementById('invLoadServiceSelect');
   if (!picker) return;
@@ -1670,45 +1708,221 @@ function populateInvoiceServicePicker() {
   `;
 }
 
+function populateInvoiceCrmPicker() {
+  const crmPicker = document.getElementById('invCrmClientSelect');
+  if (!crmPicker) return;
+  const leads = getLeadsData();
+  const options = leads.map(l => `<option value="${escapeHtml(l.id)}">${escapeHtml(l.name)} (${escapeHtml(l.phone || 'No phone')})</option>`).join('');
+  crmPicker.innerHTML = `<option value="">-- Select CRM Lead --</option>${options}`;
+}
+
+function formatInvoiceDate(date) {
+  return date.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+}
+
 function initInvoiceGenerator() {
   const itemsContainer = document.getElementById('invoiceItemsTableBody');
   const addRowBtn = document.getElementById('invAddRowBtn');
   const printBtn = document.getElementById('invPrintBtn');
+  const docTypeSelect = document.getElementById('invDocTypeSelect');
+  const crmClientSelect = document.getElementById('invCrmClientSelect');
   const currencySelect = document.getElementById('invCurrencySelect');
   const discountInput = document.getElementById('invDiscountPercent');
+  const advanceInput = document.getElementById('invAdvancePaidInput');
+  const statusSelect = document.getElementById('invPaymentStatusSelect');
+  const includeTaxToggle = document.getElementById('invIncludeTaxToggle');
   const servicePicker = document.getElementById('invLoadServiceSelect');
 
+  const newDocBtn = document.getElementById('invNewDocBtn');
+  const saveDocBtn = document.getElementById('invSaveDocBtn');
+  const sendWaBtn = document.getElementById('invSendWhatsAppBtn');
+  const sendEmailBtn = document.getElementById('invSendEmailBtn');
+
+  const badgeTitleEl = document.getElementById('invDocBadgeTitle');
+  const paperStatusPill = document.getElementById('invPaperStatusPill');
+  const numberLabelEl = document.getElementById('invNumberLabel');
+  const docNumberEl = document.getElementById('invDocNumber');
+  const dateLabelEl = document.getElementById('invDateLabel');
+  const docDateEl = document.getElementById('invDocDate');
+  const dueLabelEl = document.getElementById('invDueLabel');
+  const dueDateEl = document.getElementById('invDueDate');
+  const gstinRowEl = document.getElementById('invGstinRow');
+  const gstinValEl = document.getElementById('invGstinVal');
+  const billToHeadingEl = document.getElementById('invBillToHeading');
+  const footerDocNoteEl = document.getElementById('invFooterDocNote');
+
+  const clientNameEl = document.getElementById('invClientName');
+  const clientAttnEl = document.getElementById('invClientAttn');
+  const clientAddressEl = document.getElementById('invClientAddress');
+  const clientPhoneEl = document.getElementById('invClientPhone');
+  const clientEmailEl = document.getElementById('invClientEmail');
+  const projectTitleEl = document.getElementById('invProjectTitle');
+  const paymentModeEl = document.getElementById('invPaymentMode');
+  const paymentTermsEl = document.getElementById('invPaymentTerms');
+
   const subtotalEl = document.getElementById('invSubtotalVal');
+  const discountRowEl = document.getElementById('invDiscountRow');
+  const discountPctLabelEl = document.getElementById('invDiscountPctLabel');
+  const discountValEl = document.getElementById('invDiscountVal');
+  const taxableRowEl = document.getElementById('invTaxableRow');
+  const taxableValEl = document.getElementById('invTaxableVal');
+  const taxSummaryRowEl = document.getElementById('invTaxSummaryRow');
   const taxEl = document.getElementById('invTaxVal');
+  const grandTotalLabelEl = document.getElementById('invGrandTotalLabel');
   const grandTotalEl = document.getElementById('invGrandTotalVal');
+  const advanceRowEl = document.getElementById('invAdvanceRow');
+  const advanceValEl = document.getElementById('invAdvanceVal');
+  const balanceRowEl = document.getElementById('invBalanceRow');
+  const balanceValEl = document.getElementById('invBalanceVal');
   const wordsEl = document.getElementById('invAmountInWords');
+  const savedTableBody = document.getElementById('savedInvoicesTableBody');
 
   if (!itemsContainer) return;
 
+  const DOC_TYPE_META = {
+    ESTIMATE: {
+      badge: 'ESTIMATE',
+      prefix: 'TDM-EST',
+      numberLabel: 'Estimate #:',
+      dateLabel: 'Estimate Date:',
+      dueLabel: 'Valid Until:',
+      billHeading: 'Prepared For (Client Details)',
+      totalLabel: 'Estimated Total:',
+      footerNote: 'This is an estimate valid for 7 days. Final invoice will be issued upon project confirmation.',
+      defaultTerms: 'Valid for 7 days • 50% Advance to Start',
+      defaultStatus: 'ESTIMATE',
+      defaultTax: false
+    },
+    PROFORMA: {
+      badge: 'PROFORMA INVOICE',
+      prefix: 'TDM-PI',
+      numberLabel: 'Proforma #:',
+      dateLabel: 'Issue Date:',
+      dueLabel: 'Due Date:',
+      billHeading: 'Billed To (Client Details)',
+      totalLabel: 'Proforma Total:',
+      footerNote: 'Proforma invoice for advance initiation. Final invoice will follow upon payment.',
+      defaultTerms: '50% Advance Payment • Net 7 Days',
+      defaultStatus: 'UNPAID',
+      defaultTax: false
+    },
+    INVOICE: {
+      badge: 'INVOICE',
+      prefix: 'TDM-INV',
+      numberLabel: 'Invoice #:',
+      dateLabel: 'Invoice Date:',
+      dueLabel: 'Due Date:',
+      billHeading: 'Billed To (Client Details)',
+      totalLabel: 'Grand Total:',
+      footerNote: 'Thank you for your business! Please share payment screenshot on +91 9316954389.',
+      defaultTerms: 'Net 7 Days from invoice date',
+      defaultStatus: 'UNPAID',
+      defaultTax: false
+    },
+    TAX_INVOICE: {
+      badge: 'TAX INVOICE',
+      prefix: 'TDM-TAX',
+      numberLabel: 'Tax Invoice #:',
+      dateLabel: 'Invoice Date:',
+      dueLabel: 'Due Date:',
+      billHeading: 'Billed To (Client Details)',
+      totalLabel: 'Grand Total:',
+      footerNote: 'Tax invoice issued under GST. For billing support contact +91 9316954389.',
+      defaultTerms: 'Net 7 Days from invoice date',
+      defaultStatus: 'UNPAID',
+      defaultTax: true
+    }
+  };
+
+  let activeEditingDocId = null;
+
   populateInvoiceServicePicker();
+  populateInvoiceCrmPicker();
+
+  function generateNextDocNumber(docType) {
+    const meta = DOC_TYPE_META[docType] || DOC_TYPE_META.ESTIMATE;
+    const year = new Date().getFullYear();
+    const count = getInvoicesData().filter(d => d.docType === docType).length + 1;
+    return `${meta.prefix}-${year}-${String(count).padStart(3, '0')}`;
+  }
+
+  function applyTaxVisibility() {
+    const taxOn = Boolean(includeTaxToggle && includeTaxToggle.checked);
+    document.querySelectorAll('.inv-tax-col').forEach(el => {
+      el.style.display = taxOn ? '' : 'none';
+    });
+    if (gstinRowEl) gstinRowEl.style.display = taxOn ? '' : 'none';
+    if (taxSummaryRowEl) taxSummaryRowEl.style.display = taxOn ? 'flex' : 'none';
+  }
+
+  function syncStatusPill() {
+    if (!paperStatusPill || !statusSelect) return;
+    const st = statusSelect.value;
+    const labels = {
+      ESTIMATE: 'ESTIMATE',
+      UNPAID: 'UNPAID',
+      PARTIAL: 'PARTIAL PAID',
+      PAID: 'PAID'
+    };
+    paperStatusPill.textContent = labels[st] || st;
+    paperStatusPill.className = 'inv-paper-status-pill';
+    if (st === 'PAID') paperStatusPill.classList.add('paid');
+    else if (st === 'UNPAID') paperStatusPill.classList.add('unpaid');
+    else if (st === 'ESTIMATE') paperStatusPill.classList.add('estimate');
+  }
+
+  function applyDocTypeUI(docType, resetNumberAndTax = true) {
+    const meta = DOC_TYPE_META[docType] || DOC_TYPE_META.ESTIMATE;
+    if (badgeTitleEl) badgeTitleEl.textContent = meta.badge;
+    if (numberLabelEl) numberLabelEl.textContent = meta.numberLabel;
+    if (dateLabelEl) dateLabelEl.textContent = meta.dateLabel;
+    if (dueLabelEl) dueLabelEl.textContent = meta.dueLabel;
+    if (billToHeadingEl) billToHeadingEl.textContent = meta.billHeading;
+    if (grandTotalLabelEl) grandTotalLabelEl.textContent = meta.totalLabel;
+    if (footerDocNoteEl) footerDocNoteEl.textContent = meta.footerNote;
+
+    if (resetNumberAndTax) {
+      if (docNumberEl) docNumberEl.textContent = generateNextDocNumber(docType);
+      if (paymentTermsEl) paymentTermsEl.textContent = meta.defaultTerms;
+      if (statusSelect) statusSelect.value = meta.defaultStatus;
+      if (includeTaxToggle) includeTaxToggle.checked = meta.defaultTax;
+    }
+
+    syncStatusPill();
+    applyTaxVisibility();
+    calculateTotals();
+  }
 
   function calculateTotals() {
     let subtotal = 0;
-    let totalTax = 0;
+    let rawTaxTotal = 0;
     const currency = currencySelect ? currencySelect.value : '₹';
-    const discountPct = parseFloat(discountInput ? discountInput.value : 0) || 0;
+    const discountPct = Math.max(0, Math.min(100, parseFloat(discountInput ? discountInput.value : 0) || 0));
+    const advancePaid = Math.max(0, parseFloat(advanceInput ? advanceInput.value : 0) || 0);
+    const taxEnabled = Boolean(includeTaxToggle && includeTaxToggle.checked);
 
     const rows = itemsContainer.querySelectorAll('tr.inv-item-row');
+    const items = [];
     rows.forEach(row => {
+      const descEl = row.querySelector('.inv-item-desc');
       const qtyInput = row.querySelector('.inv-item-qty');
       const rateInput = row.querySelector('.inv-item-rate');
       const taxInput = row.querySelector('.inv-item-tax');
       const totalCol = row.querySelector('.inv-item-total');
 
-      const qty = parseFloat(qtyInput ? qtyInput.value : 1) || 1;
-      const rate = parseFloat(rateInput ? rateInput.value : 0) || 0;
-      const taxRate = parseFloat(taxInput ? taxInput.value : 0) || 0;
+      const desc = descEl ? descEl.textContent.trim() : 'Service';
+      const qty = Math.max(1, parseFloat(qtyInput ? qtyInput.value : 1) || 1);
+      const rate = Math.max(0, parseFloat(rateInput ? rateInput.value : 0) || 0);
+      const taxRate = taxEnabled ? Math.max(0, parseFloat(taxInput ? taxInput.value : 0) || 0) : 0;
 
       const lineNet = qty * rate;
-      const lineTax = lineNet * (taxRate / 100);
+      const discountedLineNet = lineNet * (1 - discountPct / 100);
+      const lineTax = discountedLineNet * (taxRate / 100);
 
       subtotal += lineNet;
-      totalTax += lineTax;
+      rawTaxTotal += lineTax;
+
+      items.push({ desc, qty, rate, tax: parseFloat(taxInput ? taxInput.value : 0) || 0, lineNet });
 
       if (totalCol) {
         totalCol.textContent = `${currency} ${lineNet.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
@@ -1716,20 +1930,42 @@ function initInvoiceGenerator() {
     });
 
     const discountAmount = subtotal * (discountPct / 100);
-    const taxableTotal = subtotal - discountAmount;
+    const taxableTotal = Math.max(0, subtotal - discountAmount);
+    const totalTax = taxEnabled ? rawTaxTotal : 0;
     const grandTotal = taxableTotal + totalTax;
+    const balanceDue = Math.max(0, grandTotal - advancePaid);
 
-    if (subtotalEl) subtotalEl.textContent = `${currency} ${subtotal.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-    if (taxEl) taxEl.textContent = `${currency} ${totalTax.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-    if (grandTotalEl) grandTotalEl.textContent = `${currency} ${grandTotal.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+    const fmt = (n) => `${currency} ${n.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 
+    if (subtotalEl) subtotalEl.textContent = fmt(subtotal);
+    if (discountRowEl) discountRowEl.style.display = discountPct > 0 ? 'flex' : 'none';
+    if (discountPctLabelEl) discountPctLabelEl.textContent = String(discountPct);
+    if (discountValEl) discountValEl.textContent = `- ${fmt(discountAmount)}`;
+
+    if (taxableRowEl) taxableRowEl.style.display = (taxEnabled && discountPct > 0) ? 'flex' : 'none';
+    if (taxableValEl) taxableValEl.textContent = fmt(taxableTotal);
+
+    if (taxSummaryRowEl) taxSummaryRowEl.style.display = taxEnabled ? 'flex' : 'none';
+    if (taxEl) taxEl.textContent = fmt(totalTax);
+
+    if (grandTotalEl) grandTotalEl.textContent = fmt(grandTotal);
+
+    if (advanceRowEl) advanceRowEl.style.display = advancePaid > 0 ? 'flex' : 'none';
+    if (advanceValEl) advanceValEl.textContent = `- ${fmt(advancePaid)}`;
+    if (balanceRowEl) balanceRowEl.style.display = advancePaid > 0 ? 'flex' : 'none';
+    if (balanceValEl) balanceValEl.textContent = fmt(balanceDue);
+
+    const wordsTarget = advancePaid > 0 ? balanceDue : grandTotal;
     if (wordsEl) {
-      wordsEl.textContent = `${numberToWords(Math.round(grandTotal))} Only (${currency})`;
+      wordsEl.textContent = `${numberToWords(Math.round(wordsTarget))} Only (${currency})`;
     }
+
+    return { subtotal, discountPct, discountAmount, taxableTotal, totalTax, grandTotal, advancePaid, balanceDue, currency, taxEnabled, items };
   }
 
-  function createItemRow(desc = 'Fast Google Keyword Ranking & SEO Sprint (Month 1)', qty = 1, rate = 25000, tax = 18) {
+  function createItemRow(desc = 'Website SEO (Search Engine Optimization)', qty = 1, rate = 4999, tax = 18) {
     const currency = currencySelect ? currencySelect.value : '₹';
+    const taxOn = Boolean(includeTaxToggle && includeTaxToggle.checked);
     const tr = document.createElement('tr');
     tr.className = 'inv-item-row';
     tr.innerHTML = `
@@ -1742,7 +1978,7 @@ function initInvoiceGenerator() {
       <td style="width: 120px; text-align: right;">
         <input type="number" class="inv-table-input inv-item-rate" value="${rate}" min="0" step="100">
       </td>
-      <td style="width: 80px; text-align: center;">
+      <td class="inv-tax-col" style="width: 80px; text-align: center; ${taxOn ? '' : 'display: none;'}">
         <input type="number" class="inv-table-input inv-item-tax" value="${tax}" min="0" step="1">
       </td>
       <td class="inv-item-total" style="width: 130px; text-align: right;">
@@ -1768,22 +2004,265 @@ function initInvoiceGenerator() {
         tr.remove();
         calculateTotals();
       } else {
-        showAdminToast('Invoice must have at least one service line item.', true);
+        showAdminToast('Kam se kam 1 service item hona zaroori hai.', true);
       }
     });
 
     return tr;
   }
 
+  function setTodayDates() {
+    const today = new Date();
+    const due = new Date(today.getTime() + 7 * 24 * 60 * 60 * 1000);
+    if (docDateEl) docDateEl.textContent = formatInvoiceDate(today);
+    if (dueDateEl) dueDateEl.textContent = formatInvoiceDate(due);
+  }
+
+  function getCurrentDocSnapshot() {
+    const calc = calculateTotals();
+    return {
+      id: activeEditingDocId || ('DOC-' + Date.now()),
+      docType: docTypeSelect ? docTypeSelect.value : 'ESTIMATE',
+      docNumber: docNumberEl ? docNumberEl.textContent.trim() : '',
+      docDate: docDateEl ? docDateEl.textContent.trim() : '',
+      dueDate: dueDateEl ? dueDateEl.textContent.trim() : '',
+      gstin: gstinValEl ? gstinValEl.textContent.trim() : '',
+      clientName: clientNameEl ? clientNameEl.textContent.trim() : '',
+      clientAttn: clientAttnEl ? clientAttnEl.textContent.trim() : '',
+      clientAddress: clientAddressEl ? clientAddressEl.textContent.trim() : '',
+      clientPhone: clientPhoneEl ? clientPhoneEl.textContent.trim() : '',
+      clientEmail: clientEmailEl ? clientEmailEl.textContent.trim() : '',
+      projectTitle: projectTitleEl ? projectTitleEl.textContent.trim() : '',
+      paymentMode: paymentModeEl ? paymentModeEl.textContent.trim() : '',
+      paymentTerms: paymentTermsEl ? paymentTermsEl.textContent.trim() : '',
+      currency: calc.currency,
+      discountPct: calc.discountPct,
+      advancePaid: calc.advancePaid,
+      paymentStatus: statusSelect ? statusSelect.value : 'ESTIMATE',
+      includeTax: calc.taxEnabled,
+      items: calc.items,
+      subtotal: calc.subtotal,
+      totalTax: calc.totalTax,
+      grandTotal: calc.grandTotal,
+      balanceDue: calc.balanceDue,
+      savedAt: new Date().toISOString()
+    };
+  }
+
+  function loadSnapshotIntoEditor(doc) {
+    activeEditingDocId = doc.id || null;
+    if (docTypeSelect) docTypeSelect.value = doc.docType || 'ESTIMATE';
+    if (currencySelect) currencySelect.value = doc.currency || '₹';
+    if (discountInput) discountInput.value = doc.discountPct ?? 0;
+    if (advanceInput) advanceInput.value = doc.advancePaid ?? 0;
+    if (statusSelect) statusSelect.value = doc.paymentStatus || 'ESTIMATE';
+    if (includeTaxToggle) includeTaxToggle.checked = Boolean(doc.includeTax);
+
+    applyDocTypeUI(doc.docType || 'ESTIMATE', false);
+
+    if (docNumberEl && doc.docNumber) docNumberEl.textContent = doc.docNumber;
+    if (docDateEl && doc.docDate) docDateEl.textContent = doc.docDate;
+    if (dueDateEl && doc.dueDate) dueDateEl.textContent = doc.dueDate;
+    if (gstinValEl && doc.gstin) gstinValEl.textContent = doc.gstin;
+    if (clientNameEl) clientNameEl.textContent = doc.clientName || '';
+    if (clientAttnEl) clientAttnEl.textContent = doc.clientAttn || '';
+    if (clientAddressEl) clientAddressEl.textContent = doc.clientAddress || '';
+    if (clientPhoneEl) clientPhoneEl.textContent = doc.clientPhone || '';
+    if (clientEmailEl) clientEmailEl.textContent = doc.clientEmail || '';
+    if (projectTitleEl) projectTitleEl.textContent = doc.projectTitle || '';
+    if (paymentModeEl) paymentModeEl.textContent = doc.paymentMode || 'Bank NEFT / RTGS / UPI';
+    if (paymentTermsEl) paymentTermsEl.textContent = doc.paymentTerms || '';
+
+    itemsContainer.innerHTML = '';
+    const items = Array.isArray(doc.items) && doc.items.length ? doc.items : [{ desc: 'Digital Marketing Service', qty: 1, rate: 4999, tax: 18 }];
+    items.forEach(it => {
+      itemsContainer.appendChild(createItemRow(it.desc, it.qty, it.rate, it.tax ?? 18));
+    });
+    applyTaxVisibility();
+    calculateTotals();
+  }
+
+  function renderSavedInvoicesHistory() {
+    if (!savedTableBody) return;
+    const list = getInvoicesData();
+    if (!list.length) {
+      savedTableBody.innerHTML = `
+        <tr>
+          <td colspan="5" style="text-align: center; padding: 22px; color: var(--admin-text-muted);">
+            Abhi koi Estimate ya Invoice save nahi hua hai. Upar "💾 Save to History" par click karein.
+          </td>
+        </tr>
+      `;
+      return;
+    }
+
+    savedTableBody.innerHTML = list.map(doc => {
+      const meta = DOC_TYPE_META[doc.docType] || DOC_TYPE_META.ESTIMATE;
+      const canConvert = doc.docType === 'ESTIMATE' || doc.docType === 'PROFORMA';
+      const cur = doc.currency || '₹';
+      return `
+        <tr>
+          <td>
+            <div style="font-weight: 700; color: var(--admin-text-main);">${escapeHtml(doc.docNumber || doc.id)}</div>
+            <span style="font-size: 0.74rem; color: var(--admin-primary); font-weight: 700;">${escapeHtml(meta.badge)}</span>
+          </td>
+          <td>
+            <div style="font-weight: 600; color: var(--admin-text-main);">${escapeHtml(doc.clientName || 'Client')}</div>
+            <div style="font-size: 0.74rem; color: var(--admin-text-muted);">${escapeHtml(doc.clientPhone || '')}</div>
+          </td>
+          <td style="font-weight: 800; color: var(--admin-primary);">
+            ${escapeHtml(cur)}${Number(doc.grandTotal || 0).toLocaleString('en-IN')}
+          </td>
+          <td>
+            <div style="font-size: 0.8rem; font-weight: 700;">${escapeHtml(doc.paymentStatus || 'ESTIMATE')}</div>
+            <div style="font-size: 0.72rem; color: var(--admin-text-muted);">${escapeHtml(doc.docDate || '')}</div>
+          </td>
+          <td>
+            <div style="display: flex; gap: 6px; flex-wrap: wrap;">
+              <button type="button" class="btn-secondary inv-load-doc-btn" data-id="${escapeHtml(doc.id)}" style="padding: 5px 10px; font-size: 0.76rem;">📂 Open</button>
+              ${canConvert ? `<button type="button" class="btn-outline-cyber inv-convert-doc-btn" data-id="${escapeHtml(doc.id)}" style="padding: 5px 10px; font-size: 0.76rem;">🔄 Convert to Tax Invoice</button>` : ''}
+              <button type="button" class="btn-secondary inv-del-doc-btn" data-id="${escapeHtml(doc.id)}" style="padding: 5px 8px; font-size: 0.76rem; color: #EF4444;">🗑️</button>
+            </div>
+          </td>
+        </tr>
+      `;
+    }).join('');
+
+    savedTableBody.querySelectorAll('.inv-load-doc-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const doc = getInvoicesData().find(d => d.id === btn.getAttribute('data-id'));
+        if (doc) {
+          loadSnapshotIntoEditor(doc);
+          showAdminToast(`Loaded ${doc.docNumber}`);
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+      });
+    });
+
+    savedTableBody.querySelectorAll('.inv-convert-doc-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const doc = getInvoicesData().find(d => d.id === btn.getAttribute('data-id'));
+        if (!doc) return;
+        const converted = {
+          ...doc,
+          id: 'DOC-' + Date.now(),
+          docType: 'TAX_INVOICE',
+          docNumber: generateNextDocNumber('TAX_INVOICE'),
+          docDate: formatInvoiceDate(new Date()),
+          dueDate: formatInvoiceDate(new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)),
+          paymentStatus: 'UNPAID',
+          includeTax: true,
+          paymentTerms: DOC_TYPE_META.TAX_INVOICE.defaultTerms
+        };
+        loadSnapshotIntoEditor(converted);
+        activeEditingDocId = null;
+        showAdminToast(`🔄 Estimate converted to ${converted.docNumber} — review & save!`);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      });
+    });
+
+    savedTableBody.querySelectorAll('.inv-del-doc-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const id = btn.getAttribute('data-id');
+        if (!confirm('Delete this saved document from history?')) return;
+        const next = getInvoicesData().filter(d => d.id !== id);
+        saveInvoicesData(next);
+        renderSavedInvoicesHistory();
+        showAdminToast('Document deleted.');
+      });
+    });
+  }
+
+  renderSavedInvoicesFn = renderSavedInvoicesHistory;
+
+  function buildShareMessage() {
+    const snap = getCurrentDocSnapshot();
+    const meta = DOC_TYPE_META[snap.docType] || DOC_TYPE_META.ESTIMATE;
+    const cur = snap.currency || '₹';
+    const f = (n) => `${cur}${Number(n || 0).toLocaleString('en-IN', { minimumFractionDigits: 0, maximumFractionDigits: 2 })}`;
+
+    const itemLines = snap.items.map((it, i) => `${i + 1}. ${it.desc} (Qty: ${it.qty} × ${f(it.rate)}) = ${f(it.lineNet)}`).join('\n');
+
+    const lines = [
+      `*${meta.badge} — ${snap.docNumber}*`,
+      `*The Digital Marketings* (Ahmedabad HQ)`,
+      `Date: ${snap.docDate} | ${meta.dueLabel.replace(':', '')}: ${snap.dueDate}`,
+      ``,
+      `*Client:* ${snap.clientName}${snap.clientAttn ? ` (${snap.clientAttn})` : ''}`,
+      `*Project:* ${snap.projectTitle}`,
+      ``,
+      `*Services Breakdown:*`,
+      itemLines,
+      ``,
+      `Subtotal: ${f(snap.subtotal)}`
+    ];
+
+    if (snap.discountPct > 0) {
+      lines.push(`Discount (${snap.discountPct}%): -${f(snap.subtotal * (snap.discountPct / 100))}`);
+    }
+    if (snap.includeTax) {
+      lines.push(`GST / Tax: ${f(snap.totalTax)}`);
+    }
+    lines.push(`*${meta.totalLabel.replace(':', '')}: ${f(snap.grandTotal)}*`);
+    if (snap.advancePaid > 0) {
+      lines.push(`Advance Paid: -${f(snap.advancePaid)}`);
+      lines.push(`*Balance Due: ${f(snap.balanceDue)}*`);
+    }
+    lines.push(``);
+    lines.push(`*Payment Details:*`);
+    lines.push(`UPI ID: 9316954389@paytm / sabirajmeri@okhdfcbank`);
+    lines.push(`Bank: HDFC Bank Ltd | A/C: 50200084729104 | IFSC: HDFC0001234`);
+    lines.push(``);
+    lines.push(`For any query, reply here or call +91 9316954389 — Sabir Ajmeri`);
+
+    return { snap, meta, text: lines.join('\n') };
+  }
+
+  // Initial Setup: Default to ESTIMATE with live rates & today's date
   const cfg = getSiteConfig();
   const seoPrice = (cfg.services.find(s => s.id === 'seo') || {}).price || 4999;
   const metaPrice = (cfg.services.find(s => s.id === 'meta-ads') || {}).price || 2499;
 
+  if (currencySelect && cfg.currency) currencySelect.value = cfg.currency;
+  setTodayDates();
   itemsContainer.innerHTML = '';
   itemsContainer.appendChild(createItemRow('Website SEO (Search Engine Optimization Sprint)', 1, seoPrice, 18));
   itemsContainer.appendChild(createItemRow('Meta Ads (FB & Instagram Management)', 1, metaPrice, 18));
+  applyDocTypeUI(docTypeSelect ? docTypeSelect.value : 'ESTIMATE', true);
+  renderSavedInvoicesHistory();
 
-  calculateTotals();
+  if (docTypeSelect) {
+    docTypeSelect.addEventListener('change', () => {
+      applyDocTypeUI(docTypeSelect.value, true);
+    });
+  }
+
+  if (includeTaxToggle) {
+    includeTaxToggle.addEventListener('change', () => {
+      applyTaxVisibility();
+      calculateTotals();
+    });
+  }
+
+  if (statusSelect) {
+    statusSelect.addEventListener('change', syncStatusPill);
+  }
+
+  if (crmClientSelect) {
+    crmClientSelect.addEventListener('change', () => {
+      const leadId = crmClientSelect.value;
+      if (!leadId) return;
+      const lead = getLeadsData().find(l => l.id === leadId);
+      if (!lead) return;
+      if (clientNameEl) clientNameEl.textContent = lead.name || '';
+      if (clientAttnEl) clientAttnEl.textContent = lead.website && lead.website !== 'N/A' ? `Website: ${lead.website}` : 'Direct Client';
+      if (clientAddressEl) clientAddressEl.textContent = lead.source ? `Source: ${lead.source}` : 'India';
+      if (clientPhoneEl) clientPhoneEl.textContent = lead.phone || '';
+      if (clientEmailEl) clientEmailEl.textContent = (lead.email && lead.email !== 'N/A' && lead.email !== 'Via Modal Inquire') ? lead.email : '';
+      if (projectTitleEl) projectTitleEl.textContent = lead.service || '360° Digital Marketing Growth';
+      showAdminToast(`✓ Loaded client details for ${lead.name}`);
+    });
+  }
 
   if (servicePicker) {
     servicePicker.addEventListener('change', () => {
@@ -1796,6 +2275,7 @@ function initInvoiceGenerator() {
       else if (kind === 'bnd') item = latestCfg.bundles.find(b => b.id === id);
       if (item) {
         itemsContainer.appendChild(createItemRow(item.name, 1, Number(item.price || 0), 18));
+        applyTaxVisibility();
         calculateTotals();
         showAdminToast(`Added "${item.name}" at live rate`);
       }
@@ -1806,12 +2286,74 @@ function initInvoiceGenerator() {
   if (addRowBtn) {
     addRowBtn.addEventListener('click', () => {
       itemsContainer.appendChild(createItemRow('New Digital Marketing Service Item', 1, 2499, 18));
+      applyTaxVisibility();
       calculateTotals();
+    });
+  }
+
+  if (newDocBtn) {
+    newDocBtn.addEventListener('click', () => {
+      activeEditingDocId = null;
+      if (docTypeSelect) docTypeSelect.value = 'ESTIMATE';
+      if (discountInput) discountInput.value = '0';
+      if (advanceInput) advanceInput.value = '0';
+      setTodayDates();
+      itemsContainer.innerHTML = '';
+      itemsContainer.appendChild(createItemRow('Website SEO (Search Engine Optimization Sprint)', 1, seoPrice, 18));
+      applyDocTypeUI('ESTIMATE', true);
+      showAdminToast('🆕 Ready for new Estimate');
+    });
+  }
+
+  if (saveDocBtn) {
+    saveDocBtn.addEventListener('click', () => {
+      const snap = getCurrentDocSnapshot();
+      const list = getInvoicesData();
+      const idx = list.findIndex(d => d.id === snap.id);
+      if (idx >= 0) list[idx] = snap;
+      else list.unshift(snap);
+      activeEditingDocId = snap.id;
+      saveInvoicesData(list);
+      renderSavedInvoicesHistory();
+      showAdminToast(`💾 Saved ${snap.docNumber} to history!`);
+    });
+  }
+
+  if (sendWaBtn) {
+    sendWaBtn.addEventListener('click', () => {
+      const { snap, text } = buildShareMessage();
+      let digits = (snap.clientPhone || '').replace(/[^0-9]/g, '');
+      if (digits.length === 10) digits = '91' + digits;
+      if (!digits || digits.length < 10) {
+        showAdminToast('Client ka WhatsApp phone number sahi se dalein (e.g. +91 98250 12345).', true);
+        return;
+      }
+      window.open(`https://wa.me/${digits}?text=${encodeURIComponent(text)}`, '_blank');
+      showAdminToast(`💬 Opening WhatsApp for ${snap.clientName}`);
+    });
+  }
+
+  if (sendEmailBtn) {
+    sendEmailBtn.addEventListener('click', () => {
+      const { snap, meta, text } = buildShareMessage();
+      const email = (snap.clientEmail || '').trim();
+      if (!email || !email.includes('@')) {
+        showAdminToast('Client ka valid Email address dalein.', true);
+        return;
+      }
+      const subject = `${meta.badge} #${snap.docNumber} — The Digital Marketings`;
+      const plainBody = text.replace(/\*/g, '');
+      if (navigator.clipboard) {
+        navigator.clipboard.writeText(plainBody).catch(() => {});
+      }
+      window.location.href = `mailto:${encodeURIComponent(email)}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(plainBody)}`;
+      showAdminToast(`✉️ Opening Email client for ${email}`);
     });
   }
 
   if (currencySelect) currencySelect.addEventListener('change', calculateTotals);
   if (discountInput) discountInput.addEventListener('input', calculateTotals);
+  if (advanceInput) advanceInput.addEventListener('input', calculateTotals);
 
   if (printBtn) {
     printBtn.addEventListener('click', () => {
@@ -1930,11 +2472,12 @@ function initStorageAndBackup() {
           return await fetchRepoJsonRelative(path);
         };
 
-        const [remoteConfig, remoteLeads, remoteAnalytics, remoteBlogs] = await Promise.all([
+        const [remoteConfig, remoteLeads, remoteAnalytics, remoteBlogs, remoteInvoices] = await Promise.all([
           readFileJson('data/site-config.json'),
           readFileJson('data/leads.json'),
           readFileJson('data/analytics.json'),
-          readFileJson('data/blogs.json')
+          readFileJson('data/blogs.json'),
+          readFileJson('data/invoices.json')
         ]);
 
         if (remoteConfig && Array.isArray(remoteConfig.services)) {
@@ -1959,11 +2502,17 @@ function initStorageAndBackup() {
           localStorage.setItem(TDM_ADMIN_KEYS.BLOGS, JSON.stringify(remoteBlogs));
         }
 
+        if (remoteInvoices && Array.isArray(remoteInvoices.invoices)) {
+          localStorage.setItem(TDM_ADMIN_KEYS.INVOICES, JSON.stringify(remoteInvoices.invoices));
+        }
+
         initAnalyticsDashboard();
         renderLeadsFn();
         renderPricingEditorFn();
         renderPublishedBlogsFn();
         populateInvoiceServicePicker();
+        populateInvoiceCrmPicker();
+        renderSavedInvoicesFn();
 
         logSync('✓ All data pulled & synced into Admin Panel!');
         showAdminToast('✓ GitHub repo se sara data pull ho gaya!');
@@ -1995,14 +2544,16 @@ function initStorageAndBackup() {
           updatedAt: new Date().toISOString(),
           posts: (rawBlogs.posts || []).map(({ htmlContent, ...meta }) => meta)
         };
+        const invoicesPayload = { version: 1, updatedAt: new Date().toISOString(), invoices: getInvoicesData() };
 
         await ghPutFile('data/site-config.json', JSON.stringify(siteConfig, null, 2) + '\n', 'Sync site-config.json from Admin');
         await ghPutFile('data/leads.json', JSON.stringify(leadsPayload, null, 2) + '\n', 'Sync leads.json from Admin');
         await ghPutFile('data/analytics.json', JSON.stringify(analyticsPayload, null, 2) + '\n', 'Sync analytics.json from Admin');
         await ghPutFile('data/blogs.json', JSON.stringify(blogsPayload, null, 2) + '\n', 'Sync blogs.json from Admin');
+        await ghPutFile('data/invoices.json', JSON.stringify(invoicesPayload, null, 2) + '\n', 'Sync invoices.json from Admin');
 
-        logSync('✓ All 4 JSON files successfully committed to GitHub!');
-        showAdminToast('🚀 Sara data (Rates, Leads, Analytics, Blogs) GitHub repo me save ho gaya!');
+        logSync('✓ All 5 JSON files successfully committed to GitHub!');
+        showAdminToast('🚀 Sara data (Rates, Leads, Analytics, Blogs, Invoices) GitHub repo me save ho gaya!');
       } catch (err) {
         logSync(`Push failed: ${err.message}`);
         showAdminToast(`Push failed: ${err.message}`, true);
@@ -2020,7 +2571,8 @@ function initStorageAndBackup() {
         siteConfig: getSiteConfig(),
         leads: getLeadsData(),
         analytics: getAnalyticsData(),
-        blogs: getBlogsData()
+        blogs: getBlogsData(),
+        invoices: getInvoicesData()
       };
       const blob = new Blob([JSON.stringify(bundle, null, 2)], { type: 'application/json' });
       const url = URL.createObjectURL(blob);
@@ -2050,12 +2602,15 @@ function initStorageAndBackup() {
         if (Array.isArray(parsed.leads)) localStorage.setItem(TDM_ADMIN_KEYS.LEADS, JSON.stringify(parsed.leads));
         if (parsed.analytics) localStorage.setItem(TDM_ADMIN_KEYS.ANALYTICS, JSON.stringify(parsed.analytics));
         if (parsed.blogs) localStorage.setItem(TDM_ADMIN_KEYS.BLOGS, JSON.stringify(parsed.blogs));
+        if (Array.isArray(parsed.invoices)) localStorage.setItem(TDM_ADMIN_KEYS.INVOICES, JSON.stringify(parsed.invoices));
 
         initAnalyticsDashboard();
         renderLeadsFn();
         renderPricingEditorFn();
         renderPublishedBlogsFn();
         populateInvoiceServicePicker();
+        populateInvoiceCrmPicker();
+        renderSavedInvoicesFn();
         showAdminToast('✓ Full backup restored!');
       };
       reader.readAsText(file);

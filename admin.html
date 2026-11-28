@@ -84,7 +84,7 @@
         </button>
         <button type="button" class="nav-item-btn" data-tab="invoice">
           <span class="nav-icon">🧾</span>
-          <span>Invoice Generator</span>
+          <span>Estimate &amp; Invoice</span>
         </button>
         <button type="button" class="nav-item-btn" data-tab="storage">
           <span class="nav-icon">☁️</span>
@@ -499,73 +499,138 @@
       </section>
 
       <!-- ====================================================================
-           VIEW 4: PROFESSIONAL INVOICE GENERATOR
+           VIEW 4: ESTIMATE & PROFESSIONAL INVOICE GENERATOR
            ==================================================================== -->
       <section class="admin-content-view" id="view-invoice">
-        <div class="invoice-toolbar no-print">
+        <div class="invoice-toolbar no-print" style="flex-direction: column; align-items: stretch; gap: 14px;">
           <div style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap;">
-            <label class="admin-label" style="margin: 0;">Currency:</label>
-            <select id="invCurrencySelect" class="admin-select" style="width: 120px;">
-              <option value="₹">₹ INR (India)</option>
-              <option value="$">$ USD (Global)</option>
-              <option value="AED">AED (Dubai)</option>
-              <option value="€">€ EUR (Europe)</option>
-              <option value="£">£ GBP (UK)</option>
-            </select>
+            <div style="display: flex; flex-direction: column; gap: 4px;">
+              <label class="admin-label" style="margin: 0; font-size: 0.72rem;" for="invDocTypeSelect">Document Type</label>
+              <select id="invDocTypeSelect" class="admin-select" style="width: 175px;">
+                <option value="ESTIMATE" selected>📋 Estimate / Quote</option>
+                <option value="PROFORMA">📄 Proforma Invoice</option>
+                <option value="INVOICE">🧾 Invoice (Non-GST)</option>
+                <option value="TAX_INVOICE">🏛️ Tax Invoice (GST)</option>
+              </select>
+            </div>
 
-            <label class="admin-label" style="margin: 0;">Discount %:</label>
-            <input type="number" id="invDiscountPercent" class="admin-input" value="0" min="0" max="100" style="width: 80px;">
+            <div style="display: flex; flex-direction: column; gap: 4px;">
+              <label class="admin-label" style="margin: 0; font-size: 0.72rem;" for="invCrmClientSelect">Load Client from CRM</label>
+              <select id="invCrmClientSelect" class="admin-select" style="width: 200px;">
+                <option value="">-- Select CRM Lead --</option>
+              </select>
+            </div>
 
-            <select id="invLoadServiceSelect" class="admin-select" style="width: 220px;">
-              <option value="">+ Quick Add Live Service Rate...</option>
-            </select>
+            <div style="display: flex; flex-direction: column; gap: 4px;">
+              <label class="admin-label" style="margin: 0; font-size: 0.72rem;" for="invCurrencySelect">Currency</label>
+              <select id="invCurrencySelect" class="admin-select" style="width: 115px;">
+                <option value="₹">₹ INR</option>
+                <option value="$">$ USD</option>
+                <option value="AED">AED</option>
+                <option value="€">€ EUR</option>
+                <option value="£">£ GBP</option>
+              </select>
+            </div>
+
+            <div style="display: flex; flex-direction: column; gap: 4px;">
+              <label class="admin-label" style="margin: 0; font-size: 0.72rem;" for="invDiscountPercent">Discount %</label>
+              <input type="number" id="invDiscountPercent" class="admin-input" value="0" min="0" max="100" style="width: 85px;">
+            </div>
+
+            <div style="display: flex; flex-direction: column; gap: 4px;">
+              <label class="admin-label" style="margin: 0; font-size: 0.72rem;" for="invAdvancePaidInput">Advance Paid</label>
+              <input type="number" id="invAdvancePaidInput" class="admin-input" value="0" min="0" step="100" style="width: 110px;">
+            </div>
+
+            <div style="display: flex; flex-direction: column; gap: 4px;">
+              <label class="admin-label" style="margin: 0; font-size: 0.72rem;" for="invPaymentStatusSelect">Status</label>
+              <select id="invPaymentStatusSelect" class="admin-select" style="width: 145px;">
+                <option value="ESTIMATE">📋 Estimate</option>
+                <option value="UNPAID">⏳ Unpaid</option>
+                <option value="PARTIAL">🟡 Partial Paid</option>
+                <option value="PAID">✅ Paid</option>
+              </select>
+            </div>
+
+            <div style="display: flex; flex-direction: column; gap: 4px;">
+              <label class="admin-label" style="margin: 0; font-size: 0.72rem;" for="invLoadServiceSelect">Add Live Rate</label>
+              <select id="invLoadServiceSelect" class="admin-select" style="width: 210px;">
+                <option value="">+ Quick Add Live Service Rate...</option>
+              </select>
+            </div>
+
+            <label style="display: flex; align-items: center; gap: 7px; font-size: 0.82rem; color: var(--admin-text-body); margin-top: 16px; cursor: pointer;">
+              <input type="checkbox" id="invIncludeTaxToggle" style="width: 16px; height: 16px; accent-color: var(--admin-primary);">
+              <span>Include GST / Tax</span>
+            </label>
           </div>
 
-          <div style="display: flex; gap: 12px;">
-            <button type="button" class="btn-cyber" id="invPrintBtn">
-              <span>🖨️ Print / Save as PDF</span>
-            </button>
+          <div style="display: flex; gap: 10px; flex-wrap: wrap; justify-content: space-between; align-items: center; border-top: 1px solid var(--admin-border); padding-top: 12px;">
+            <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+              <button type="button" class="btn-outline-cyber" id="invNewDocBtn">
+                <span>🆕 New Estimate</span>
+              </button>
+              <button type="button" class="btn-secondary" id="invSaveDocBtn">
+                <span>💾 Save to History</span>
+              </button>
+            </div>
+
+            <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+              <button type="button" class="btn-whatsapp" id="invSendWhatsAppBtn" style="padding: 10px 16px; font-size: 0.88rem;">
+                <span>💬 Send on WhatsApp</span>
+              </button>
+              <button type="button" class="btn-outline-cyber" id="invSendEmailBtn">
+                <span>✉️ Send via Email</span>
+              </button>
+              <button type="button" class="btn-cyber" id="invPrintBtn">
+                <span>🖨️ Print / Save PDF</span>
+              </button>
+            </div>
           </div>
         </div>
 
-        <!-- Printable Luxury Invoice Paper Canvas -->
+        <!-- Printable Luxury Estimate / Invoice Paper Canvas -->
         <div class="invoice-paper" id="printableInvoice">
           
-          <!-- Invoice Header -->
+          <!-- Header -->
           <div class="inv-header">
             <div class="inv-brand-col">
               <img src="assets/logo.png" alt="The Digital Marketings" class="inv-logo-img">
               <div class="inv-company-name">The Digital Marketings</div>
               <div class="inv-address-line">
                 Ahmedabad HQ, Gujarat, India • Pin 380001<br>
-                Founder & CEO: Sabir Ajmeri<br>
+                Founder &amp; CEO: Sabir Ajmeri<br>
                 Phone: +91 9316954389 • Email: infothedigitalmarketings@gmail.com<br>
                 Website: thedigitalmarketings.com
               </div>
             </div>
             <div class="inv-meta-col">
-              <div class="inv-badge-title">TAX INVOICE</div>
-              <div class="inv-meta-item">Invoice #: <strong contenteditable="true">TDM-INV-2026-042</strong></div>
-              <div class="inv-meta-item">Invoice Date: <strong contenteditable="true">14 Sep 2026</strong></div>
-              <div class="inv-meta-item">Due Date: <strong contenteditable="true">21 Sep 2026</strong></div>
-              <div class="inv-meta-item">GSTIN / Tax ID: <strong contenteditable="true">24AAAAA0000A1Z5</strong></div>
+              <div style="display: flex; align-items: center; justify-content: flex-end; gap: 8px;">
+                <span class="inv-paper-status-pill" id="invPaperStatusPill">ESTIMATE</span>
+                <div class="inv-badge-title" id="invDocBadgeTitle" style="margin-bottom: 0;">ESTIMATE</div>
+              </div>
+              <div class="inv-meta-item" style="margin-top: 10px;"><span id="invNumberLabel">Estimate #:</span> <strong id="invDocNumber" contenteditable="true">TDM-EST-2026-001</strong></div>
+              <div class="inv-meta-item"><span id="invDateLabel">Estimate Date:</span> <strong id="invDocDate" contenteditable="true">28 Nov 2026</strong></div>
+              <div class="inv-meta-item"><span id="invDueLabel">Valid Until:</span> <strong id="invDueDate" contenteditable="true">05 Dec 2026</strong></div>
+              <div class="inv-meta-item" id="invGstinRow" style="display: none;">GSTIN / Tax ID: <strong id="invGstinVal" contenteditable="true">24AAAAA0000A1Z5</strong></div>
             </div>
           </div>
 
           <!-- Billed To / Client Info -->
           <div class="inv-bill-row">
             <div class="inv-bill-col">
-              <h4>Billed To (Client Details)</h4>
-              <div class="inv-bill-name" contenteditable="true">Patel Textile Exporters Pvt Ltd</div>
-              <div class="inv-bill-text" contenteditable="true">Attn: Mr. Rajesh Patel (Managing Director)</div>
-              <div class="inv-bill-text" contenteditable="true">S.G. Highway, Ahmedabad, Gujarat, India</div>
-              <div class="inv-bill-text" contenteditable="true">Phone: +91 98250 12345 • rajesh@pateltextiles.com</div>
+              <h4 id="invBillToHeading">Prepared For (Client Details)</h4>
+              <div class="inv-bill-name" id="invClientName" contenteditable="true">Patel Textile Exporters Pvt Ltd</div>
+              <div class="inv-bill-text" id="invClientAttn" contenteditable="true">Attn: Mr. Rajesh Patel (Managing Director)</div>
+              <div class="inv-bill-text" id="invClientAddress" contenteditable="true">S.G. Highway, Ahmedabad, Gujarat, India</div>
+              <div class="inv-bill-text">Phone / WA: <strong id="invClientPhone" contenteditable="true">+91 98250 12345</strong></div>
+              <div class="inv-bill-text">Email: <strong id="invClientEmail" contenteditable="true">rajesh@pateltextiles.com</strong></div>
             </div>
             <div class="inv-bill-col">
-              <h4>Project & Payment Terms</h4>
-              <div class="inv-bill-text"><strong>Project:</strong> 360° Digital Marketing & Fast Google SEO Sprint</div>
-              <div class="inv-bill-text"><strong>Payment Mode:</strong> Bank NEFT / RTGS / UPI</div>
-              <div class="inv-bill-text"><strong>Term:</strong> Net 7 Days from invoice date</div>
+              <h4>Project &amp; Payment Terms</h4>
+              <div class="inv-bill-text"><strong>Project:</strong> <span id="invProjectTitle" contenteditable="true">360° Digital Marketing &amp; Fast Google SEO Sprint</span></div>
+              <div class="inv-bill-text"><strong>Payment Mode:</strong> <span id="invPaymentMode" contenteditable="true">Bank NEFT / RTGS / UPI</span></div>
+              <div class="inv-bill-text"><strong>Term:</strong> <span id="invPaymentTerms" contenteditable="true">Valid for 7 days • 50% Advance to Start</span></div>
             </div>
           </div>
 
@@ -576,7 +641,7 @@
                 <th style="width: 48%;">Service Description</th>
                 <th style="width: 10%; text-align: center;">Qty</th>
                 <th style="width: 16%; text-align: right;">Rate</th>
-                <th style="width: 10%; text-align: center;">Tax %</th>
+                <th class="inv-tax-col" style="width: 10%; text-align: center; display: none;">Tax %</th>
                 <th style="width: 16%; text-align: right;">Amount</th>
                 <th class="no-print" style="width: 36px; text-align: center;"></th>
               </tr>
@@ -592,7 +657,7 @@
             </button>
           </div>
 
-          <!-- Invoice Summary & Bank Details -->
+          <!-- Summary & Bank Details -->
           <div class="inv-summary-grid">
             <div class="inv-bank-box">
               <h5>Official Bank Transfer / UPI Details</h5>
@@ -609,18 +674,34 @@
             <div class="inv-calc-box">
               <div class="inv-calc-row">
                 <span>Subtotal:</span>
-                <span id="invSubtotalVal">₹ 50,000.00</span>
+                <span id="invSubtotalVal">₹ 0.00</span>
               </div>
-              <div class="inv-calc-row">
+              <div class="inv-calc-row" id="invDiscountRow" style="display: none; color: #059669;">
+                <span>Discount (<span id="invDiscountPctLabel">0</span>%):</span>
+                <span id="invDiscountVal">- ₹ 0.00</span>
+              </div>
+              <div class="inv-calc-row" id="invTaxableRow" style="display: none;">
+                <span>Taxable Amount:</span>
+                <span id="invTaxableVal">₹ 0.00</span>
+              </div>
+              <div class="inv-calc-row" id="invTaxSummaryRow" style="display: none;">
                 <span>GST / Tax Total:</span>
-                <span id="invTaxVal">₹ 9,000.00</span>
+                <span id="invTaxVal">₹ 0.00</span>
               </div>
               <div class="inv-calc-row grand-total">
-                <span>Grand Total:</span>
-                <span id="invGrandTotalVal">₹ 59,000.00</span>
+                <span id="invGrandTotalLabel">Estimated Total:</span>
+                <span id="invGrandTotalVal">₹ 0.00</span>
+              </div>
+              <div class="inv-calc-row" id="invAdvanceRow" style="display: none;">
+                <span>Advance Paid:</span>
+                <span id="invAdvanceVal">- ₹ 0.00</span>
+              </div>
+              <div class="inv-calc-row" id="invBalanceRow" style="display: none; font-weight: 800; color: #0F172A;">
+                <span>Balance Due:</span>
+                <span id="invBalanceVal">₹ 0.00</span>
               </div>
               <div class="inv-in-words" id="invAmountInWords">
-                INR Fifty Nine Thousand Only (₹)
+                Zero Only (₹)
               </div>
             </div>
           </div>
@@ -629,7 +710,7 @@
           <div class="inv-footer-note" style="margin-top: 40px; padding-top: 20px; border-top: 1px solid #E2E8F0; display: flex; justify-content: space-between; align-items: flex-end; font-size: 0.8rem; color: #64748B;">
             <div>
               <p>Thank you for choosing <strong>The Digital Marketings</strong> as your growth partner!</p>
-              <p>For support, call +91 9316954389 or email infothedigitalmarketings@gmail.com</p>
+              <p id="invFooterDocNote">This is an estimate valid for 7 days. Final invoice will be issued upon project confirmation.</p>
             </div>
             <div style="text-align: right;">
               <div style="font-family: 'Outfit', sans-serif; font-weight: 800; color: #0F172A; font-size: 0.95rem;">Sabir Ajmeri</div>
@@ -637,6 +718,32 @@
             </div>
           </div>
 
+        </div>
+
+        <!-- Saved Estimates & Invoices History -->
+        <div class="admin-card no-print" style="margin-top: 24px;">
+          <div class="admin-card-header" style="flex-wrap: wrap;">
+            <div class="card-title-wrap">
+              <h3 class="admin-card-title">🗂️ Saved Estimates &amp; Invoices History</h3>
+              <p class="admin-card-subtitle">Purane Estimates ko 1-click me dobara kholein ya Tax Invoice me convert karein</p>
+            </div>
+          </div>
+          <div class="table-responsive">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>Doc # &amp; Type</th>
+                  <th>Client</th>
+                  <th>Total</th>
+                  <th>Status &amp; Date</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="savedInvoicesTableBody">
+                <!-- Populated by admin.js -->
+              </tbody>
+            </table>
+          </div>
         </div>
       </section>
 

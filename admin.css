@@ -2070,6 +2070,9 @@ body {
   #view-analytics,
   #view-leads,
   #view-blog,
+  #view-pricing,
+  #view-storage,
+  #adminToastContainer,
   #blogExportModal,
   .admin-modal-overlay,
   .sidebar-footer,
@@ -2493,6 +2496,38 @@ body {
     grid-template-columns: 1fr;
   }
 }
+
+.inv-paper-status-pill {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 9999px;
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  background: #FEF3C7;
+  color: #92400E;
+  border: 1px solid #F59E0B;
+}
+
+.inv-paper-status-pill.paid {
+  background: #D1FAE5;
+  color: #065F46;
+  border-color: #10B981;
+}
+
+.inv-paper-status-pill.unpaid {
+  background: #FEE2E2;
+  color: #991B1B;
+  border-color: #EF4444;
+}
+
+.inv-paper-status-pill.estimate {
+  background: #E0F2FE;
+  color: #075985;
+  border-color: #0284C7;
+}
+
 
 
 
